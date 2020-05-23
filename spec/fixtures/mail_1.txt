@@ -1,0 +1,62 @@
+Delivered-To: dummy@test.com
+Received: by 2002:a4a:d031:0:0:0:0:0 with SMTP id w17csp2701290oor;
+        Sat, 25 Apr 2020 22:14:05 -0700 (PDT)
+X-Google-Smtp-Source: APiQypKEwlQHFpBjlyVVOjs6/yM03y923rrp2ZuHSb/yn5ruf0r8yjmR2X3le7QCaN/zAsMrQujh
+X-Received: by 2002:a17:902:a706:: with SMTP id w6mr17215337plq.173.1587878045528;
+        Sat, 25 Apr 2020 22:14:05 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1587878045; cv=none;
+        d=google.com; s=arc-20160816;
+        b=PSKvgOV0vT8tvLNmEVvwK3oatZtQBd0ekWcHLRsk6S07T8kLdqEW2sgJNLaZtCXMws
+         FFPofpfUcAFcjKFc/8NUgDM4RnSa65D3lkg5F4HVEuG72BfaRAfTum9WlMX+GEz4Npp0
+         VI1c7aRIjFCsxSdpU4t38yzfp7zNSktGYVJX1S6NCsbZkMSFZnLPCiaTQ9MOZzIAUkCj
+         YTv8vb8pBLvuKVqkDXEM4i50BXQlfepBICb3Ymb0sdc7chNs6ilzR3/MIQcIkq5InYP3
+         cCBKjEvI7g8yzYWBf6hYdF6stHqcFDYiPq5en0cf1JZnWcps5oMpZtNzgEyVrADYlqz1
+         X2Qg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20160816;
+        h=reply-to:message-id:reply-to:message-id:reply-to:message-id
+         :reply-to:zg3z7drdu9:reply-to:863603920963269:message-id:reply-to
+         :list-unsubscribe:message-id:reply-to:message-id:reply-to:message-id
+         :mime-version:date:subject:date:mime-version:from;
+        bh=pfaiAOe8IkzWNDRhjLKgZvm2kDZ3neecvpEY3W6dEq8=;
+        b=K7rJX1o3b/KeMg65GbP86sV9aLhxP7CFwyy3IR+9MagDer8M45Wi2BH1h5Zcbw89hC
+         R4D4jIFBNAUWZegQOc5vbiiNLVDp+7HMQ/14LgHGbmONg3yFFZNTJecqdcCvMKOEV0Gc
+         KhelIA8ptBEeNbPhd2ERS2TvjA5C0a8mIjspn8MWlF0Bqj+pzE/TYYYRfsdwxOYyqoB1
+         BGvaXzIhqUqEtTEm0uF2+SC2iwfxha8PaH/KDjjBLnI4CGI0cVsWvUV0rxQSkljt8OZ1
+         YqMILPU3MeAMrLtLfp6EtSZeGNsKheKY41zOplM+HILBiUgm5DNIQjWaQ82Tx2BIZ7z6
+         o5Mg==
+ARC-Authentication-Results: i=1; mx.google.com;
+       spf=pass (google.com: best guess record for domain of scam@my.dodgy.host.com designates 10.0.0.1 as permitted sender) smtp.mailfrom=scam@my.dodgy.host.com
+Return-Path: <somethingdodgy@test.com>
+Received: from not.real.com (my.dodgy.host.com. [10.0.0.1])
+        by mx.google.com with ESMTP id b201si8173212pfb.88.2020.04.25.22.14.05
+        for <dummy@test.com>;
+        Sat, 25 Apr 2020 22:14:05 -0700 (PDT)
+Received-SPF: pass (google.com: best guess record for domain of scam@my.dodgy.host.com designates 10.0.0.1 as permitted sender) client-ip=10.0.0.1;
+Authentication-Results: mx.google.com;
+     spf=pass (google.com: best guess record for domain of scam@my.dodgy.host.com designates 10.0.0.1 as permitted sender) smtp.mailfrom=scam@my.dodgy.host.com
+Received: from still.not.real.com (another.dodgy.hostcom. 10.0.0.2)
+From: "🔔ALERT🔔" <do_not@believethis.com>
+MIME-Version: 080.517
+Date: Sun, 26 Apr 2020 01:14:04 -0400
+Subject: ⚠️rFoo⚠️ Bar Baz
+Date: Sun, 26 Apr 2020 01:14:04 -0400
+MIME-Version: 1.0
+Message-ID: <aVzCGLMmail1dVv4OK2STn2.atl084517451478@dodgy.com>
+Reply-To: <UYL4O05CKRMOCGB@8179.832>
+Message-ID: <tNIwlBHmails62jyST48zS9.atl444685124501@dodgy.com>
+Reply-To: <093EQZIAIZEMNGT@3121.295>
+Message-ID: <QPGAwlKmailxTCZetFthQmS.atl494192820967@dodgy.com>
+List-Unsubscribe: <ab-4fd-4fd-wjhtuplsolbg@yeahright.com>
+Reply-To: <0R6SXF0LLNIAF5Y@1739.842>, <3XUGT4L0VPPDYAB@2899.232>
+Message-ID: <pjmpydvmailzh2ASHOkDw7j.atl655943603336@dodgy.com>
+863603920963269: 6RF0G2IHJCT7@033.02
+Reply-To: a@dodgy.com, b@dodgy.com, c@dodgy.com
+ZG3Z7DRDU9: XCTVFVWV3IIJCDU@3187.228
+Content-Type: multipart/alternative; boundary="----=_943263e326673e9c633ba23da6f4ce5"
+Reply-To: <YL1J605V6XP25G7@0418.287>
+Message-ID: <mLNmRwgmailaQ6vzwXhbYcM.atl370308050784@dodgy.com>
+Reply-To: <N3M8G6FZ1PCWHSB@2624.698>
+Message-ID: <pNFTgPSmailjz9YdTZpSzC4.atl047128319854@dodgy.com>
+Reply-To: <6LCNMRYZWC11Z8C@1699.813>
+
+This is the body
