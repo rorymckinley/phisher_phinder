@@ -1,9 +1,10 @@
 Delivered-To: dummy@test.com
-Received: by 2002:a4a:d031:0:0:0:0:0 with SMTP id w17csp2701290oor;
-        Sat, 25 Apr 2020 22:14:05 -0700 (PDT)
+Received: by 2002:a4a:d031:0:0:0:0:0 with SMTP id w17csp2701290oor
+        for anotherdummy@test.com;
+        Sat, 25 Apr 2020 22:14:07 -0700 (PDT)
 X-Google-Smtp-Source: APiQypKEwlQHFpBjlyVVOjs6/yM03y923rrp2ZuHSb/yn5ruf0r8yjmR2X3le7QCaN/zAsMrQujh
 X-Received: by 2002:a17:902:a706:: with SMTP id w6mr17215337plq.173.1587878045528;
-        Sat, 25 Apr 2020 22:14:05 -0700 (PDT)
+        Sat, 25 Apr 2020 22:14:06 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; t=1587878045; cv=none;
         d=google.com; s=arc-20160816;
         b=PSKvgOV0vT8tvLNmEVvwK3oatZtQBd0ekWcHLRsk6S07T8kLdqEW2sgJNLaZtCXMws
@@ -34,7 +35,7 @@ Received: from not.real.com (my.dodgy.host.com. [10.0.0.1])
 Received-SPF: pass (google.com: best guess record for domain of scam@my.dodgy.host.com designates 10.0.0.1 as permitted sender) client-ip=10.0.0.1;
 Authentication-Results: mx.google.com;
      spf=pass (google.com: best guess record for domain of scam@my.dodgy.host.com designates 10.0.0.1 as permitted sender) smtp.mailfrom=scam@my.dodgy.host.com
-Received: from still.not.real.com (another.dodgy.hostcom. 10.0.0.2)
+Received: from still.not.real.com (another.dodgy.host.com. 10.0.0.2)
 From: "🔔ALERT🔔" <do_not@believethis.com>
 MIME-Version: 080.517
 Date: Sun, 26 Apr 2020 01:14:04 -0400
