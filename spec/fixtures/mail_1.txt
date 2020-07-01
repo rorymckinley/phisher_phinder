@@ -1,10 +1,10 @@
 Delivered-To: dummy@test.com
 Received: by 2002:a4a:d031:0:0:0:0:0 with SMTP id w17csp2701290oor
         for anotherdummy@test.com;
-        Sat, 25 Apr 2020 22:14:07 -0700 (PDT)
+        Sat, 25 Apr 2020 22:14:08 -0700 (PDT)
 X-Google-Smtp-Source: APiQypKEwlQHFpBjlyVVOjs6/yM03y923rrp2ZuHSb/yn5ruf0r8yjmR2X3le7QCaN/zAsMrQujh
 X-Received: by 2002:a17:902:a706:: with SMTP id w6mr17215337plq.173.1587878045528;
-        Sat, 25 Apr 2020 22:14:06 -0700 (PDT)
+        Sat, 25 Apr 2020 22:14:07 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; t=1587878045; cv=none;
         d=google.com; s=arc-20160816;
         b=PSKvgOV0vT8tvLNmEVvwK3oatZtQBd0ekWcHLRsk6S07T8kLdqEW2sgJNLaZtCXMws
@@ -25,17 +25,23 @@ ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc
          BGvaXzIhqUqEtTEm0uF2+SC2iwfxha8PaH/KDjjBLnI4CGI0cVsWvUV0rxQSkljt8OZ1
          YqMILPU3MeAMrLtLfp6EtSZeGNsKheKY41zOplM+HILBiUgm5DNIQjWaQ82Tx2BIZ7z6
          o5Mg==
+Received: from probably.not.real.com ([10.0.0.3])
+        by mx.google.com with ESMTPS id u23si16237783eds.526.2020.06.26.06.27.53
+        for <mannequin@test.com>
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Sat, 25 Apr 2020 22:14:06 -0700
 ARC-Authentication-Results: i=1; mx.google.com;
        spf=pass (google.com: best guess record for domain of scam@my.dodgy.host.com designates 10.0.0.1 as permitted sender) smtp.mailfrom=scam@my.dodgy.host.com
 Return-Path: <somethingdodgy@test.com>
-Received: from not.real.com (my.dodgy.host.com. [10.0.0.1])
-        by mx.google.com with ESMTP id b201si8173212pfb.88.2020.04.25.22.14.05
+Received: from not.real.com (my.dodgy.host.com. [10.0.0.4])
+        by mx.google.com (8.14.7/8.14.7) with ESMTP id b201si8173212pfb.88.2020.04.25.22.14.05
         for <dummy@test.com>;
         Sat, 25 Apr 2020 22:14:05 -0700 (PDT)
 Received-SPF: pass (google.com: best guess record for domain of scam@my.dodgy.host.com designates 10.0.0.1 as permitted sender) client-ip=10.0.0.1;
 Authentication-Results: mx.google.com;
      spf=pass (google.com: best guess record for domain of scam@my.dodgy.host.com designates 10.0.0.1 as permitted sender) smtp.mailfrom=scam@my.dodgy.host.com
-Received: from still.not.real.com (another.dodgy.host.com. 10.0.0.2)
+Received: from still.not.real.com (another.dodgy.host.com. 10.0.0.5)
+Received: (from root@localhost) by still.dodgy.host.com (8.14.7/8.14.7/Submit) id 05QDRrso001911
 From: "🔔ALERT🔔" <do_not@believethis.com>
 MIME-Version: 080.517
 Date: Sun, 26 Apr 2020 01:14:04 -0400

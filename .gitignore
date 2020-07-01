@@ -9,3 +9,10 @@
 
 # rspec failure tracking
 .rspec_status
+
+*.sqlite3
+
+*.env
+*.env.test
+
+test_files

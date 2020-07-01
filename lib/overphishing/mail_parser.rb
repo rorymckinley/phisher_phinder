@@ -1,10 +1,10 @@
 # frozen_string_literal: true
-require 'pry'
 
 module Overphishing
   class MailParser
-    def initialize
-      @line_end = "\n"
+    def initialize(enriched_ip_factory, line_ending_type)
+      @line_end = line_ending_type == 'dos' ? "\r\n" : "\n"
+      @enriched_ip_factory = enriched_ip_factory
     end
 
     def parse(contents)
@@ -84,9 +84,14 @@ module Overphishing
 
       scanner = StringScanner.new(data)
 
-      from_part = scanner.scan(/from\s.+\([^)]+?\)/)
+      if scanner.check(/\(from\s+[^)]+\)/)
+        from_part = scanner.scan(/\(from\s+[^)]+\)/)
+      else
+        from_part = scanner.scan(/from\s.+?\([^)]+?\)/)
+      end
       by_part = scanner.scan(/\s?by.+?id\s[\S]+\s?/) unless scanner.eos?
-      for_part = scanner.rest unless scanner.eos?
+      for_part = scanner.scan(/for\s+\S+/) unless scanner.eos?
+      starttls_part = scanner.rest unless scanner.eos?
 
       base = {
         advertised_sender: nil,
@@ -94,28 +99,51 @@ module Overphishing
         partial: true,
         protocol: nil,
         recipient: nil,
+        recipient_additional: nil,
         recipient_mailbox: nil,
         sender: nil,
+        starttls: nil,
         time: nil
       }
 
       if from_part
         patterns = [
           /from\s(?<advertised_sender>[\S]+)\s\((?<sender_host>\S+?)\.?\s\[(?<sender_ip>[^\]]+)\]\)/,
-          /from\s(?<advertised_sender>\S+)\s\((?<sender_host>\S+?)\.?\s(?<sender_ip>\S+?)\)/
+          /from\s(?<advertised_sender>\S+)\s\((?<sender_host>\S+?)\.?\s(?<sender_ip>\S+?)\)/,
+          /from\s(?<advertised_sender>\S+)\s\(\[(?<sender_ip>[^\]]+)\]\)/,
+          /\(from\s(?<advertised_sender>[^)]+)\)/
         ]
 
         matches = patterns.inject(nil) do |memo, pattern|
           memo || from_part.match(pattern)
         end
 
-        base.merge!(advertised_sender: matches[:advertised_sender], sender: {host: matches[:sender_host], ip: matches[:sender_ip]})
+        base.merge!(
+          advertised_sender: matches[:advertised_sender],
+          sender: {
+            host: matches.names.include?('sender_host') ? matches[:sender_host] : nil,
+            ip: matches.names.include?('sender_ip') ? @enriched_ip_factory.build(matches[:sender_ip]) : nil
+          }
+        )
       end
 
       if by_part
-        matches = by_part.match(/by\s(?<recipient>\S+)\swith\s(?<protocol>\S+)\sid\s(?<id>\S+)/)
+        patterns = [
+          /by\s(?<recipient>\S+)\swith\s(?<protocol>\S+)\sid\s(?<id>\S+)/,
+          /by\s(?<recipient>\S+)\s\((?<additional>[^)]+)\)\swith\s(?<protocol>\S+)\sid\s(?<id>\S+)/,
+          /by\s(?<recipient>\S+)\s\((?<additional>[^)]+)\)\sid\s(?<id>\S+)/
+        ]
 
-        base.merge!(recipient: matches[:recipient], protocol: matches[:protocol], id: matches[:id])
+        matches = patterns.inject(nil) do |memo, pattern|
+          memo || by_part.match(pattern)
+        end
+
+        base.merge!(
+          recipient: enrich_recipient(matches[:recipient]),
+          protocol: matches.names.include?('protocol') ? matches[:protocol]: nil,
+          id: matches[:id],
+          recipient_additional: matches.names.include?('additional') ? matches[:additional] : nil
+        )
       end
 
       if for_part
@@ -124,7 +152,15 @@ module Overphishing
         base.merge!(recipient_mailbox: strip_angle_brackets($1))
       end
 
-      base.merge!(partial: !(from_part && by_part && for_part && true))
+      if starttls_part
+        matches = starttls_part.match(/\(version=(?<version>\S+)\scipher=(?<cipher>\S+)\sbits=(?<bits>\S+)\)/)
+
+        require 'pry'
+        binding.pry unless matches
+        base.merge!(starttls: {version: matches[:version], cipher: matches[:cipher], bits: matches[:bits]})
+      end
+
+      base.merge!(partial: !(from_part && by_part && for_part && (base[:protocol] != 'ESMPTS' || (base[:protocol] == 'ESMTPS' && starttls_part)) && true))
 
       base
     end
@@ -133,6 +169,8 @@ module Overphishing
       require 'time'
 
       Time.strptime(timestamp.strip, "%a, %d %b %Y %H:%M:%S %z (%Z)")
+    rescue ArgumentError
+      Time.strptime(timestamp.strip, "%a, %d %b %Y %H:%M:%S %z")
     end
 
     def restore_sequence(values)
@@ -141,6 +179,14 @@ module Overphishing
 
     def strip_angle_brackets(email_address_string)
       email_address_string =~ /\<([^>]+)\>/ ? $1 : email_address_string
+    end
+
+    def enrich_recipient(recipient)
+      @enriched_ip_factory.build(recipient) || recipient
+    end
+
+    def is_ip?(data)
+      data =~ Resolv::IPv6::Regex || data =~ Resolv::IPv4::Regex
     end
   end
 end
