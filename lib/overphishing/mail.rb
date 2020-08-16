@@ -2,14 +2,17 @@
 
 module Overphishing
   class Mail
-    attr_reader :original_email, :original_headers, :original_body, :headers, :tracing_headers
+    attr_reader :original_email, :original_headers, :original_body, :headers, :tracing_headers, :body
 
-    def initialize(original_email:, original_headers:, original_body:, headers:, tracing_headers: )
+    def initialize(
+      original_email:, original_headers:, original_body:, headers:, tracing_headers:, body:
+    )
       @original_email = original_email
       @original_headers = original_headers
       @original_body = original_body
       @headers = headers
       @tracing_headers = tracing_headers
+      @body = body
     end
 
     def reply_to_addresses
@@ -20,7 +23,17 @@ module Overphishing
       end.uniq
     end
 
+    def hypertext_links
+      body_as_html.xpath('//a').map { |el| BodyHyperlink.new(el.attributes['href'].value, el.text) }
+    end
+
     private
+
+    def body_as_html
+      require 'nokogiri'
+
+      Nokogiri::HTML(body[:html])
+    end
 
     def extract_email_address(email_address_string)
       if email_address_string.include? '<'

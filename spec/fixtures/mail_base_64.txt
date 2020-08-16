@@ -30,20 +30,17 @@ Received: from probably.not.real.com ([10.0.0.3])
         for <mannequin@test.com>
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
         Sat, 25 Apr 2020 22:14:06 -0700
-Received: from also.made.up ([10.0.0.4])
-	      by fuzzy.fake.com Fuzzy Corp with SMTP
-	      id 3gJek488nka743gKRkR2nY; Sat, 25 Apr 2020 22:14:05 -0700
 ARC-Authentication-Results: i=1; mx.google.com;
        spf=pass (google.com: best guess record for domain of scam@my.dodgy.host.com designates 10.0.0.1 as permitted sender) smtp.mailfrom=scam@my.dodgy.host.com
 Return-Path: <somethingdodgy@test.com>
-Received: from not.real.com (my.dodgy.host.com. [10.0.0.5])
+Received: from not.real.com (my.dodgy.host.com. [10.0.0.4])
         by mx.google.com (8.14.7/8.14.7) with ESMTP id b201si8173212pfb.88.2020.04.25.22.14.05
         for <dummy@test.com>;
-        Sat, 25 Apr 2020 22:14:04 -0700 (PDT)
+        Sat, 25 Apr 2020 22:14:05 -0700 (PDT)
 Received-SPF: pass (google.com: best guess record for domain of scam@my.dodgy.host.com designates 10.0.0.1 as permitted sender) client-ip=10.0.0.1;
 Authentication-Results: mx.google.com;
      spf=pass (google.com: best guess record for domain of scam@my.dodgy.host.com designates 10.0.0.1 as permitted sender) smtp.mailfrom=scam@my.dodgy.host.com
-Received: from still.not.real.com (another.dodgy.host.com. 10.0.0.6)
+Received: from still.not.real.com (another.dodgy.host.com. 10.0.0.5)
 Received: (from root@localhost) by still.dodgy.host.com (8.14.7/8.14.7/Submit) id 05QDRrso001911
 From: "🔔ALERT🔔" <do_not@believethis.com>
 MIME-Version: 080.517
@@ -67,6 +64,8 @@ Message-ID: <mLNmRwgmailaQ6vzwXhbYcM.atl370308050784@dodgy.com>
 Reply-To: <N3M8G6FZ1PCWHSB@2624.698>
 Message-ID: <pNFTgPSmailjz9YdTZpSzC4.atl047128319854@dodgy.com>
 Reply-To: <6LCNMRYZWC11Z8C@1699.813>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/html; charset=UTF-8
+Content-Transfer-Encoding: base64
 
-This is the body
+VGhpcyBpcyB0aGUg
+YmFzZSA2NCBib2R5

@@ -1,14 +1,17 @@
 require 'spec_helper'
 require 'ipaddr'
 
-RSpec.describe Overphishing::MailParser do
+RSpec.describe Overphishing::MailParser::Parser do
+  let(:base64_mail_contents) { IO.read(File.join(FIXTURE_PATH, 'mail_base_64.txt')) }
   let(:complete_mail_contents) { IO.read(File.join(FIXTURE_PATH, 'mail_1.txt')) }
+  let(:multipart_base64_mail_contents) { IO.read(File.join(FIXTURE_PATH, 'mail_base_64_multipart.txt')) }
   let(:simple_mail_contents) { IO.read(File.join(FIXTURE_PATH, 'mail_2.txt')) }
   let(:enriched_ip_1) { instance_double(Overphishing::ExtendedIp) }
   let(:enriched_ip_2) { instance_double(Overphishing::ExtendedIp) }
   let(:enriched_ip_3) { instance_double(Overphishing::ExtendedIp) }
   let(:enriched_ip_4) { instance_double(Overphishing::ExtendedIp) }
   let(:enriched_ip_5) { instance_double(Overphishing::ExtendedIp) }
+  let(:enriched_ip_6) { instance_double(Overphishing::ExtendedIp) }
   let(:enriched_ip_factory) do
     instance_double(Overphishing::ExtendedIpFactory).tap do |factory|
       allow(factory).to receive(:build) do |arg|
@@ -23,6 +26,8 @@ RSpec.describe Overphishing::MailParser do
           enriched_ip_4
         when '10.0.0.5'
           enriched_ip_5
+        when '10.0.0.6'
+          enriched_ip_6
         when 'mx.google.com'
           nil
         end
@@ -34,6 +39,12 @@ RSpec.describe Overphishing::MailParser do
     "Delivered-To: dummy@test.com\n" +
     "Received: by 2002:a4a:d031:0:0:0:0:0 with SMTP id w17csp2701290oor;\n" +
     "        Sat, 25 Apr 2020 22:14:05 -0700 (PDT)"
+  end
+  let(:parsed_mail_with_base64_body) do
+    described_class.new(enriched_ip_factory, ENV.fetch('LINE_ENDING_TYPE')).parse(base64_mail_contents)
+  end
+  let(:parsed_mail_with_multipart_base64_body) do
+    described_class.new(enriched_ip_factory, ENV.fetch('LINE_ENDING_TYPE')).parse(multipart_base64_mail_contents)
   end
   let(:parsed_complete_mail) do
     described_class.new(enriched_ip_factory, ENV.fetch('LINE_ENDING_TYPE')).parse(complete_mail_contents)
@@ -68,9 +79,9 @@ RSpec.describe Overphishing::MailParser do
           {data: '<093EQZIAIZEMNGT@3121.295>', sequence: 13},
           {data: '<0R6SXF0LLNIAF5Y@1739.842>, <3XUGT4L0VPPDYAB@2899.232>', sequence: 10},
           {data: 'a@dodgy.com, b@dodgy.com, c@dodgy.com', sequence: 7},
-          {data: '<YL1J605V6XP25G7@0418.287>', sequence: 4},
-          {data: '<N3M8G6FZ1PCWHSB@2624.698>', sequence: 2},
-          {data: '<6LCNMRYZWC11Z8C@1699.813>', sequence: 0}
+          {data: '<YL1J605V6XP25G7@0418.287>', sequence: 5},
+          {data: '<N3M8G6FZ1PCWHSB@2624.698>', sequence: 3},
+          {data: '<6LCNMRYZWC11Z8C@1699.813>', sequence: 1}
         ])
       end
 
@@ -113,6 +124,18 @@ RSpec.describe Overphishing::MailParser do
             time: Time.new(2020, 4, 25, 22, 14, 6, '-07:00')
           },
           {
+            advertised_sender: 'also.made.up',
+            id: '3gJek488nka743gKRkR2nY',
+            partial: true,
+            protocol: 'SMTP',
+            recipient: 'fuzzy.fake.com',
+            recipient_additional: 'Fuzzy Corp',
+            recipient_mailbox: nil,
+            starttls: nil,
+            sender: {host: nil, ip: enriched_ip_4},
+            time: Time.new(2020, 4, 25, 22, 14, 5, '-07:00')
+          },
+          {
             advertised_sender: 'not.real.com',
             id: 'b201si8173212pfb.88.2020.04.25.22.14.05',
             partial: false,
@@ -120,9 +143,9 @@ RSpec.describe Overphishing::MailParser do
             recipient: 'mx.google.com',
             recipient_additional: '8.14.7/8.14.7',
             recipient_mailbox: 'dummy@test.com',
-            sender: {host: 'my.dodgy.host.com', ip: enriched_ip_4},
+            sender: {host: 'my.dodgy.host.com', ip: enriched_ip_5},
             starttls: nil,
-            time: Time.new(2020, 4, 25, 22, 14, 5, '-07:00')
+            time: Time.new(2020, 4, 25, 22, 14, 4, '-07:00')
           },
           {
             advertised_sender: 'still.not.real.com',
@@ -132,7 +155,7 @@ RSpec.describe Overphishing::MailParser do
             recipient: nil,
             recipient_additional: nil,
             recipient_mailbox: nil,
-            sender: {host: 'another.dodgy.host.com', ip: enriched_ip_5},
+            sender: {host: 'another.dodgy.host.com', ip: enriched_ip_6},
             starttls: nil,
             time: nil
           },
@@ -149,6 +172,27 @@ RSpec.describe Overphishing::MailParser do
             time: nil
           }
         ])
+      end
+
+      it 'stores the email body as plain text if no content type is specified' do
+        expect(parsed_simple_mail.body).to eql({text: "This is the body\n", html: nil})
+      end
+
+      it 'stores the email body where the body is specified as plain text' do
+        expect(parsed_complete_mail.body).to eql({text: "This is the body\n", html: nil})
+      end
+
+      it 'decodes the mail body if it is specified as base64-encoded' do
+        expect(parsed_mail_with_base64_body.body).to eql({html: 'This is the base 64 body', text: nil})
+      end
+
+      it 'decodes the mail body if it is multipart-encoded' do
+        expect(parsed_mail_with_multipart_base64_body.body).to eql(
+          {
+            html: 'ThreeFour',
+            text: 'OneTwo'
+          }
+        )
       end
     end
   end

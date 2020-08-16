@@ -123,7 +123,7 @@ RSpec.describe Overphishing::CachedGeoipClient do
       expect(record.country_name).to eql  "People's Republic of Hout Bay"
     end
 
-    it 'replaces a persisted record if the record was last updated outside the expiry window', :aggregate_failures do
+    it 'replaces a persisted record if the record was last updated outside the expiry window' do
       persisted_record = Overphishing::GeoipIpData.create(
         ip_address: '1.1.1.1', country_name: "People's Republic of Hout Bay"
       )
@@ -135,7 +135,7 @@ RSpec.describe Overphishing::CachedGeoipClient do
       expect(record.country_name).to eql 'South Africa'
     end
 
-    it 'replaces a persisted record if the record was last updated on the edge of the expiry window', :aggregate_failures do
+    it 'replaces a persisted record if the record was last updated on the edge of the expiry window' do
       persisted_record = Overphishing::GeoipIpData.create(
         ip_address: '1.1.1.1', country_name: "People's Republic of Hout Bay"
       )
@@ -147,5 +147,94 @@ RSpec.describe Overphishing::CachedGeoipClient do
       expect(record.country_name).to eql 'South Africa'
     end
 
+    it 'returns a record if it fetched a new record but the record data remained the same' do
+      subject.lookup('1.1.1.1')
+
+      Overphishing::GeoipIpData.last.this.update(updated_at: expiry_time)
+
+      expect(subject.lookup('1.1.1.1')).to_not be_nil
+    end
+  end
+  describe 'no city data returned' do
+    let(:insight) do
+      MaxMind::GeoIP2::Model::Insights.new(record, ["en"])
+    end
+    let(:record) do
+      {
+        "city" => {
+          "confidence" => 90,
+          "geoname_id" => 3369157,
+        },
+        "continent" => {
+          "code" => "AF",
+          "geoname_id" => 6255146,
+          "names" => {"en" => "Africa"}
+        },
+        "country" => {
+          "confidence" => 99,
+          "iso_code" => "ZA",
+          "geoname_id" => 953987,
+          "names" => {"en" => "South Africa"}
+        },
+        "location" => {
+          "accuracy_radius" => 20,
+          "latitude" => -33.9165,
+          "longitude" => 18.4155,
+          "time_zone" => "Africa/Johannesburg"
+        },
+        "maxmind" => {
+          "queries_remaining" => 6632
+        },
+        "postal" => {
+          "confidence" => 1,
+          "code" => "7700"
+        },
+        "registered_country" => {
+          "iso_code" => "ZA",
+          "geoname_id" => 953987,
+          "names" => {
+            "en"=>"South Africa"
+          }
+        },
+        "subdivisions" => [
+          {
+            "confidence" => 99,
+            "iso_code" => "WC",
+            "geoname_id" => 1085599,
+            "names" => {
+              "en" => "Western Cape"
+            }
+          }
+        ],
+        "traits"=> {
+          "static_ip_score" => 21.5,
+          "user_count" => 1,
+          "user_type" => "residential",
+          "autonomous_system_number" => 9999,
+          "autonomous_system_organization" => "FOO-CORP",
+          "domain" => "foocorp.co.za",
+          "isp" => "foo-corp",
+          "organization" => "foocorp",
+          "ip_address" => "1.1.1.1",
+          "network" => "1.1.1.1/32"
+        }
+      }
+    end
+
+    subject { described_class.new(client, expiry_time) }
+
+    it 'saves correctly when persisting for the first time', :aggregate_failures do
+      expect { subject.lookup('1.1.1.1') }.to_not raise_error
+
+      expect(Overphishing::GeoipIpData.last.city_name).to be_nil
+    end
+
+    it 'saves correctly when updating the record', :aggregate_failures do
+      expect { subject.lookup('1.1.1.1') }.to_not raise_error
+
+      Overphishing::GeoipIpData.last.this.update(updated_at: expiry_time)
+
+      expect { subject.lookup('1.1.1.1') }.to_not raise_error
+    end
   end
 end

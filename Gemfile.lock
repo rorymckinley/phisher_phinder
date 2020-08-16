@@ -10,6 +10,8 @@ GEM
       public_suffix (>= 2.0.2, < 5.0)
     coderay (1.1.2)
     connection_pool (2.2.3)
+    crack (0.4.3)
+      safe_yaml (~> 1.0.0)
     database_cleaner (1.8.5)
     database_cleaner-sequel (1.8.0)
       database_cleaner (~> 1.8.0)
@@ -22,6 +24,7 @@ GEM
     ffi-compiler (1.0.1)
       ffi (>= 1.0.0)
       rake
+    hashdiff (1.0.1)
     http (4.4.1)
       addressable (~> 2.3)
       http-cookie (~> 1.0)
@@ -38,6 +41,9 @@ GEM
       http (~> 4.3)
       maxmind-db (~> 1.1)
     method_source (1.0.0)
+    mini_portile2 (2.4.0)
+    nokogiri (1.10.10)
+      mini_portile2 (~> 2.4.0)
     pry (0.13.1)
       coderay (~> 1.1)
       method_source (~> 1.0)
@@ -56,11 +62,16 @@ GEM
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.9.0)
     rspec-support (3.9.3)
+    safe_yaml (1.0.5)
     sequel (5.33.0)
     sqlite3 (1.4.2)
     unf (0.1.4)
       unf_ext
     unf_ext (0.0.7.7)
+    webmock (3.8.3)
+      addressable (>= 2.3.6)
+      crack (>= 0.3.2)
+      hashdiff (>= 0.4.0, < 2.0.0)
 
 PLATFORMS
   ruby
@@ -69,12 +80,14 @@ DEPENDENCIES
   database_cleaner-sequel (= 1.8.0)
   dotenv (~> 2.7.5)
   maxmind-geoip2 (~> 0.4.0)
+  nokogiri (~> 1.10.10)
   overphishing!
   pry
   rake (~> 12.0)
   rspec (~> 3.0)
   sequel (~> 5.33)
   sqlite3 (~> 1.4.2)
+  webmock (~> 3.8.3)
 
 BUNDLED WITH
    2.1.4

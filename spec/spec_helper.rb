@@ -7,6 +7,7 @@ DB = Sequel.connect(ENV.fetch('DATABASE_URL'))
 
 require "overphishing"
 require 'database_cleaner/sequel'
+require 'webmock/rspec'
 
 DatabaseCleaner.url_whitelist = ['sqlite://test.sqlite3']
 

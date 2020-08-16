@@ -36,7 +36,7 @@ module Overphishing
           latitude: lookup_result.location.latitude,
           longitude: lookup_result.location.longitude,
           time_zone: lookup_result.location.time_zone,
-          city_name: lookup_result.city.names[@lang],
+          city_name: (lookup_result.city.names ? lookup_result.city.names[@lang] : nil),
           city_geoname_id: lookup_result.city.geoname_id,
           city_confidence: lookup_result.city.confidence,
           country_name: lookup_result.country.names[@lang],
@@ -58,6 +58,8 @@ module Overphishing
           static_ip_score: lookup_result.traits.static_ip_score,
           user_type: lookup_result.traits.user_type
         )
+
+        cached_record
       else
         Overphishing::GeoipIpData.create(
           ip_address: ip_address,
@@ -65,7 +67,7 @@ module Overphishing
           latitude: lookup_result.location.latitude,
           longitude: lookup_result.location.longitude,
           time_zone: lookup_result.location.time_zone,
-          city_name: lookup_result.city.names[@lang],
+          city_name: (lookup_result.city.names ? lookup_result.city.names[@lang] : nil),
           city_geoname_id: lookup_result.city.geoname_id,
           city_confidence: lookup_result.city.confidence,
           country_name: lookup_result.country.names[@lang],
