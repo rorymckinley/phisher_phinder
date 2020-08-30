@@ -6,6 +6,7 @@ RSpec.describe Overphishing::MailParser::Parser do
   let(:complete_mail_contents) { IO.read(File.join(FIXTURE_PATH, 'mail_1.txt')) }
   let(:multipart_base64_mail_contents) { IO.read(File.join(FIXTURE_PATH, 'mail_base_64_multipart.txt')) }
   let(:simple_mail_contents) { IO.read(File.join(FIXTURE_PATH, 'mail_2.txt')) }
+  let(:mail_with_utf8_subject_contents) { IO.read(File.join(FIXTURE_PATH, 'mail_utf8_subject.txt')) }
   let(:enriched_ip_1) { instance_double(Overphishing::ExtendedIp) }
   let(:enriched_ip_2) { instance_double(Overphishing::ExtendedIp) }
   let(:enriched_ip_3) { instance_double(Overphishing::ExtendedIp) }
@@ -51,6 +52,9 @@ RSpec.describe Overphishing::MailParser::Parser do
   end
   let(:parsed_simple_mail) do
     described_class.new(enriched_ip_factory, ENV.fetch('LINE_ENDING_TYPE')).parse(simple_mail_contents)
+  end
+  let(:parsed_mail_utf8_subject) do
+    described_class.new(enriched_ip_factory, ENV.fetch('LINE_ENDING_TYPE')).parse(mail_with_utf8_subject_contents)
   end
   let(:received_header_value) do
     "by 2002:a4a:d031:0:0:0:0:0 with SMTP id w17csp2701290oor; Sat, 25 Apr 2020 22:14:05 -0700 (PDT)"
@@ -193,6 +197,11 @@ RSpec.describe Overphishing::MailParser::Parser do
             text: 'OneTwo'
           }
         )
+      end
+
+      it 'has a decoded subject if the original subject was UTF-8 Base64 encoded' do
+        subject = parsed_mail_utf8_subject.headers[:subject][:data]
+        expect(subject).to eql 'foõßæÞ'
       end
     end
   end

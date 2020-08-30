@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 require_relative('mail_parser/body_parser')
+require_relative('mail_parser/header_value_parser')
 
 module Overphishing
   module MailParser
@@ -55,7 +56,7 @@ module Overphishing
       end
 
       def enrich_header_value(value, sequence)
-        {data: value.strip, sequence: sequence}
+        {data: HeaderValueParser.new.parse(value), sequence: sequence}
       end
 
       def generate_tracing_headers(headers)
