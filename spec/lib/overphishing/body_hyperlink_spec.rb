@@ -2,15 +2,40 @@
 require 'uri'
 
 RSpec.describe Overphishing::BodyHyperlink do
-  it 'exposes the href for the hyperlink' do
-    expect(described_class.new('https://foo/bar', '').href).to eql URI.parse('https://foo/bar')
+  it 'indicates the type of link' do
+    expect(described_class.new('https://foo/bar', '').type).to eql :url
+    expect(described_class.new('https://foo/bar#baz', '').type).to eql :url
+    expect(described_class.new('foobarbaz', '').type).to eql :url
+    expect(described_class.new('#baz', '').type).to eql :url_fragment
+    expect(described_class.new('  #baz  ', '').type).to eql :url_fragment
+    expect(described_class.new('mailto:foo@b.com', '').type).to eql :email_address
+    expect(described_class.new('  mailto:foo@b.com  ', '').type).to eql :email_address
+    expect(described_class.new('tel:12345', '').type).to eql :telephone_number
+    expect(described_class.new('  tel:12345  ', '').type).to eql :telephone_number
+  end
+
+  describe 'href' do
+    it 'exposes the href for the hyperlink as a URI instance if it is a URL' do
+      expect(described_class.new('https://foo/bar', '').href).to eql URI.parse('https://foo/bar')
+      expect(described_class.new('  https://foo/bar  ', '').href).to eql URI.parse('https://foo/bar')
+    end
+
+    it 'does not attempt to parse an href if the link href is not url', :aggregate_failures do
+      expect(described_class.new('#baz', '').href).to eql '#baz'
+      expect(described_class.new('  #baz  ', '').href).to eql '#baz'
+      expect(described_class.new('mailto:foo@b.com', '').href).to eql 'mailto:foo@b.com'
+      expect(described_class.new('  mailto:foo@b.com  ', '').href).to eql 'mailto:foo@b.com'
+      expect(described_class.new('tel:12345', '').href).to eql 'tel:12345'
+      expect(described_class.new('  tel:12345  ', '').href).to eql 'tel:12345'
+    end
   end
 
   it 'exposes the text for the hyperlink' do
     expect(described_class.new('', 'Foo Link').text).to eql 'Foo Link'
+    expect(described_class.new('', '  Foo Link  ').text).to eql '  Foo Link  '
   end
 
-  it 'removes characters from the hyperlink that cannot be aprsed as part of the URI' do
+  it 'removes characters from the hyperlink that cannot be parsed as part of the URI' do
     expect(described_class.new('https://foo/bar##foo', '').href).to eql URI.parse('https://foo/bar')
   end
 
