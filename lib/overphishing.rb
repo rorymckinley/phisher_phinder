@@ -14,6 +14,13 @@ require_relative './overphishing/extended_ip_factory'
 require_relative './overphishing/mail_parser'
 require_relative './overphishing/mail'
 require_relative './overphishing/simple_ip'
+require_relative './overphishing/mail_parser/received_headers/parser'
+require_relative './overphishing/mail_parser/received_headers/by_parser'
+require_relative './overphishing/mail_parser/received_headers/classifier'
+require_relative './overphishing/mail_parser/received_headers/for_parser'
+require_relative './overphishing/mail_parser/received_headers/from_parser'
+require_relative './overphishing/mail_parser/received_headers/starttls_parser'
+require_relative './overphishing/mail_parser/received_headers/timestamp_parser'
 
 module Overphishing
   class Error < StandardError; end
