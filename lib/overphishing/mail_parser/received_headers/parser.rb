@@ -45,7 +45,7 @@ module Overphishing
             from_part = scanner.scan(/from\s.+?\([^)]+?\)/)
           end
 
-          by_part = scanner.scan(/\s?by.+?id\s[\S]+\s?/) unless scanner.eos?
+          by_part = scanner.scan(/\s?by.+?\sid\s[\S]+\s?/) unless scanner.eos?
           for_part = scanner.scan(/for\s+\S+/) unless scanner.eos?
           starttls_part = scanner.rest unless scanner.eos?
 

@@ -100,6 +100,21 @@ RSpec.describe Overphishing::MailParser::ReceivedHeaders::Parser do
         subject.parse(header_parts.join)
       end
 
+      it 'partial header - by with userid' do
+        expect(from_parser).to receive(:parse).with(nil)
+        expect(by_parser).to receive(:parse).with('by probably.spam.sender (Postfix, from userid 0) id 095A71BA8')
+        expect(for_parser).to receive(:parse).with(nil)
+        expect(starttls_parser).to receive(:parse).with(nil)
+        expect(timestamp_parser).to receive(:parse).with(' Mon,  7 Sep 2020 16:48:12 +0300 (MSK)')
+
+        header_parts = [
+          'by probably.spam.sender (Postfix, from userid 0) ',
+          'id 095A71BA8; Mon,  7 Sep 2020 16:48:12 +0300 (MSK)'
+        ]
+
+        subject.parse(header_parts.join)
+      end
+
       it 'full header with TLS' do
         expect(from_parser).to receive(:parse).with('from probably.not.real.com ([10.0.0.3])')
         expect(by_parser).to receive(:parse).with(
