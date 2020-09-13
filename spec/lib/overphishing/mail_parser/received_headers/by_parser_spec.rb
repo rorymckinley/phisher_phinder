@@ -22,9 +22,6 @@ RSpec.describe Overphishing::MailParser::ReceivedHeaders::ByParser do
   let(:sample_4) do
     ' by mx.google.com (8.14.7/8.14.7) with ESMTP id b201si8173212pfb.88.2020.04.25.22.14.05 '
   end
-  let(:sample_5) do
-    'by foo.bar-host.baz (Postfix, from userid 0) '
-  end
 
   subject  { described_class.new(enriched_ip_factory) }
 
@@ -67,15 +64,6 @@ RSpec.describe Overphishing::MailParser::ReceivedHeaders::ByParser do
       recipient_additional: '8.14.7/8.14.7',
       protocol: 'ESMTP',
       id: 'b201si8173212pfb.88.2020.04.25.22.14.05'
-    })
-  end
-
-  it 'sample 5' do
-    expect(subject.parse(sample_5)).to eql({
-      recipient: 'foo.bar-host.baz',
-      recipient_additional: 'Postfix, from userid 0',
-      protocol: nil,
-      id: nil,
     })
   end
 end
