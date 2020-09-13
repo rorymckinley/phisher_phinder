@@ -31,12 +31,17 @@ RSpec.describe Overphishing::BodyHyperlink do
   end
 
   it 'exposes the text for the hyperlink' do
-    expect(described_class.new('', 'Foo Link').text).to eql 'Foo Link'
-    expect(described_class.new('', '  Foo Link  ').text).to eql '  Foo Link  '
+    expect(described_class.new('https://foo.bar', 'Foo Link').text).to eql 'Foo Link'
+    expect(described_class.new('https://foo.bar', '  Foo Link  ').text).to eql '  Foo Link  '
   end
 
-  it 'removes characters from the hyperlink that cannot be parsed as part of the URI' do
+  it 'can deal with URLs that contain fragment identifiers' do
     expect(described_class.new('https://foo/bar##foo', '').href).to eql URI.parse('https://foo/bar')
+    expect(described_class.new('https://foo/bar#[[Email]]', '').href).to eql URI.parse('https://foo/bar')
+  end
+
+  it 'stores the raw href that was passed in' do
+    expect(described_class.new('https://foo/bar#[[Email]]', '').raw_href).to eql 'https://foo/bar#[[Email]]'
   end
 
   it 'considers two instances to be eql if they have the same href and link text' do

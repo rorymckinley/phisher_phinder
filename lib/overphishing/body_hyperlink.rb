@@ -2,10 +2,11 @@
 
 module Overphishing
   class BodyHyperlink
-    attr_reader :href, :text, :type
+    attr_reader :href, :text, :type, :raw_href
 
     def initialize(href, text)
       @type = classify_href(href.strip)
+      @raw_href = href
       @href = parse_href(href)
       @text = text
     end
@@ -30,11 +31,11 @@ module Overphishing
     end
 
     def parse_href(href)
-      @type == :url ? URI.parse(sanitize_uri(href.strip)) : href.strip
+      @type == :url ? URI.parse(strip_off_fragments(href.strip)) : href.strip
     end
 
-    def sanitize_uri(uri)
-      uri.gsub(/##.+\z/, '')
+    def strip_off_fragments(uri)
+      uri.split('#').first
     end
   end
 end
