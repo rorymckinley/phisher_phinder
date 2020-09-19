@@ -11,6 +11,10 @@ module Overphishing
       @text = text
     end
 
+    def supports_retrieval?
+      @type == :url && href.is_a?(URI)
+    end
+
     def ==(other)
       href == other.href && text == other.text
     end
@@ -31,7 +35,9 @@ module Overphishing
     end
 
     def parse_href(href)
-      @type == :url ? URI.parse(strip_off_fragments(href.strip)) : href.strip
+      stripped_href = href.strip
+
+      (@type == :url && !stripped_href.empty?) ? URI.parse(strip_off_fragments(stripped_href)) : stripped_href
     end
 
     def strip_off_fragments(uri)

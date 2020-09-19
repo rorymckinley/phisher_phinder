@@ -28,6 +28,10 @@ RSpec.describe Overphishing::BodyHyperlink do
       expect(described_class.new('tel:12345', '').href).to eql 'tel:12345'
       expect(described_class.new('  tel:12345  ', '').href).to eql 'tel:12345'
     end
+
+    it 'does not attempt to parse en empty href' do
+      expect(described_class.new('', '').href).to eql ''
+    end
   end
 
   it 'exposes the text for the hyperlink' do
@@ -48,5 +52,13 @@ RSpec.describe Overphishing::BodyHyperlink do
     expect(described_class.new('https://foo/bar', 'Foo')).to eq described_class.new('https://foo/bar', 'Foo')
     expect(described_class.new('https://notfoo/bar', 'Foo')).to_not eq described_class.new('https://foo/bar', 'Foo')
     expect(described_class.new('https://foo/bar', 'Foo')).to_not eq described_class.new('https://foo/bar', 'NotFoo')
+  end
+
+  it 'indicates if the link supports retrieval of contents' do
+    expect(described_class.new('https://foo/bar', '').supports_retrieval?).to be_truthy
+    expect(described_class.new('#baz', '').supports_retrieval?).to be_falsey
+    expect(described_class.new('mailto:foo@b.com', '').supports_retrieval?).to be_falsey
+    expect(described_class.new('tel:12345', '').supports_retrieval?).to be_falsey
+    expect(described_class.new('', '').supports_retrieval?).to be_falsey
   end
 end

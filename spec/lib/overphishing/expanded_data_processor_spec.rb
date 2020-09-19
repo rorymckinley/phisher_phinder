@@ -11,6 +11,7 @@ RSpec.describe Overphishing::ExpandedDataProcessor do
       '<a href="mailto:a@b.com">Mail</a>' +
       '<a href="http://baz">Baz</a>' +
       '<a href="#fragment">Frag</a>' +
+      '<a href=""></a>' +
       '</html>'
   end
   let(:mail) do
@@ -91,6 +92,13 @@ RSpec.describe Overphishing::ExpandedDataProcessor do
         {
           href: '#fragment',
           link_text: 'Frag',
+          content_requested: false,
+          error: nil,
+          response: nil
+        },
+        {
+          href: '',
+          link_text: '',
           content_requested: false,
           error: nil,
           response: nil

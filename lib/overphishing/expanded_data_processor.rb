@@ -18,7 +18,7 @@ module Overphishing
         error: nil
       }
 
-      if link.type == :url
+      if link.supports_retrieval?
         require 'net/http'
 
         begin

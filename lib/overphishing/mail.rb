@@ -24,7 +24,10 @@ module Overphishing
     end
 
     def hypertext_links
-      body_as_html.xpath('//a').map { |el| BodyHyperlink.new(el.attributes['href'].value, el.text) }
+      body_as_html.
+        xpath('//a').
+        select { |el| el.attributes['href'] }.
+        map { |el| BodyHyperlink.new(el.attributes['href'].value, el.text) }
     end
 
     private
