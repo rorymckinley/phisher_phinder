@@ -27,6 +27,7 @@ RSpec.describe Overphishing::MailParser::ReceivedHeaders::FromParser do
   let(:sample_3) { '(from root@localhost)' }
   let(:sample_4) { 'from still.not.real.com (another.dodgy.host.com. 10.0.0.6)' }
   let(:sample_5) { 'from not.real.com (10.0.0.7)' }
+  let(:sample_6) { 'from root ' }
 
   subject { described_class.new(enriched_ip_factory) }
 
@@ -82,6 +83,16 @@ RSpec.describe Overphishing::MailParser::ReceivedHeaders::FromParser do
       sender: {
         host: nil,
         ip: enriched_ip_4
+      }
+    })
+  end
+
+  it 'sample 6' do
+    expect(subject.parse(sample_6)).to eql({
+      advertised_sender: 'root',
+      sender: {
+        host: nil,
+        ip: nil
       }
     })
   end

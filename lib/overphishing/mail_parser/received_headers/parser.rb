@@ -41,6 +41,8 @@ module Overphishing
 
           if scanner.check(/\(from\s+[^)]+\)/)
             from_part = scanner.scan(/\(from\s+[^)]+\)/)
+          elsif scanner.check(/from\s[^)(]+\sby/)
+            from_part = scanner.scan(/from.+?(?=by)/)
           else
             from_part = scanner.scan(/from\s.+?\([^)]+?\)/)
           end

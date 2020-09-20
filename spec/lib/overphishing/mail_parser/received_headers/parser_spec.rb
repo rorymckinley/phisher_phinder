@@ -193,6 +193,24 @@ RSpec.describe Overphishing::MailParser::ReceivedHeaders::Parser do
         subject.parse(header_parts.join)
       end
 
+      it 'full header (internal routing?)' do
+        expect(from_parser).to receive(:parse).with('from root ')
+        expect(by_parser).to receive(:parse).with(
+          'by spam.test.zzz with local-generated (Exim 4.92) (envelope-from <is.this.real.zzz>) id 1kIXad-0006OQ-VE '
+        )
+        expect(for_parser).to receive(:parse).with('for dummy@test.com')
+
+        header_parts = [
+          'from root by spam.test.zzz with local-generated (Exim 4.92) ',
+          '(envelope-from <is.this.real.zzz>) ',
+          'id 1kIXad-0006OQ-VE ',
+          'for dummy@test.com; ',
+          'Wed, 16 Sep 2020 15:35:16 +0200'
+        ]
+
+        subject.parse(header_parts.join)
+      end
+
       it 'classifies a header based on its values' do
         expect(classifier).to receive(:classify).with(
           {by: :output, for: :output, from: :output, starttls: :output, time: :output}
