@@ -22,6 +22,13 @@ RSpec.describe Overphishing::MailParser::ReceivedHeaders::ByParser do
   let(:sample_4) do
     ' by mx.google.com (8.14.7/8.14.7) with ESMTP id b201si8173212pfb.88.2020.04.25.22.14.05 '
   end
+  let(:sample_5) do
+    'by dodgy.host.zzz (10.0.0.1) with Microsoft SMTP Server ' +
+      '(version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2044.4'
+  end
+  let(:sample_6) do
+    ' by dodgy.host.zzz (DODGY SMTP Server 2.3.2) with SMTP ID 702 '
+  end
 
   subject  { described_class.new(enriched_ip_factory) }
 
@@ -64,6 +71,24 @@ RSpec.describe Overphishing::MailParser::ReceivedHeaders::ByParser do
       recipient_additional: '8.14.7/8.14.7',
       protocol: 'ESMTP',
       id: 'b201si8173212pfb.88.2020.04.25.22.14.05'
+    })
+  end
+
+  it 'sample 5' do
+    expect(subject.parse(sample_5)).to eql({
+      recipient: 'dodgy.host.zzz',
+      recipient_additional: '10.0.0.1',
+      protocol: 'Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384)',
+      id: '15.1.2044.4'
+    })
+  end
+
+  it 'sample 6' do
+    expect(subject.parse(sample_6)).to eql({
+      recipient: 'dodgy.host.zzz',
+      recipient_additional: 'DODGY SMTP Server 2.3.2',
+      protocol: 'SMTP',
+      id: '702'
     })
   end
 end

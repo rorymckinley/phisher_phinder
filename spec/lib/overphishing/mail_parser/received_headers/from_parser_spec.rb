@@ -6,8 +6,6 @@ RSpec.describe Overphishing::MailParser::ReceivedHeaders::FromParser do
   let(:enriched_ip_2) { instance_double(Overphishing::ExtendedIp) }
   let(:enriched_ip_3) { instance_double(Overphishing::ExtendedIp) }
   let(:enriched_ip_4) { instance_double(Overphishing::ExtendedIp) }
-  let(:enriched_ip_5) { instance_double(Overphishing::ExtendedIp) }
-  let(:enriched_ip_6) { instance_double(Overphishing::ExtendedIp) }
   let(:enriched_ip_factory) do
     instance_double(Overphishing::ExtendedIpFactory).tap do |factory|
       allow(factory).to receive(:build) do |arg|
@@ -18,6 +16,8 @@ RSpec.describe Overphishing::MailParser::ReceivedHeaders::FromParser do
           enriched_ip_2
         when '10.0.0.6'
           enriched_ip_3
+        when '10.0.0.7'
+          enriched_ip_4
         end
       end
     end
@@ -26,6 +26,7 @@ RSpec.describe Overphishing::MailParser::ReceivedHeaders::FromParser do
   let(:sample_2) { 'from not.real.com (my.dodgy.host.com. [10.0.0.5])' }
   let(:sample_3) { '(from root@localhost)' }
   let(:sample_4) { 'from still.not.real.com (another.dodgy.host.com. 10.0.0.6)' }
+  let(:sample_5) { 'from not.real.com (10.0.0.7)' }
 
   subject { described_class.new(enriched_ip_factory) }
 
@@ -71,6 +72,16 @@ RSpec.describe Overphishing::MailParser::ReceivedHeaders::FromParser do
       sender: {
         host: 'another.dodgy.host.com',
         ip: enriched_ip_3
+      }
+    })
+  end
+
+  it 'sample 5' do
+    expect(subject.parse(sample_5)).to eql({
+      advertised_sender: 'not.real.com',
+      sender: {
+        host: nil,
+        ip: enriched_ip_4
       }
     })
   end

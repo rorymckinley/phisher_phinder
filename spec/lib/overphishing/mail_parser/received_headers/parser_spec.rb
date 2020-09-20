@@ -156,6 +156,43 @@ RSpec.describe Overphishing::MailParser::ReceivedHeaders::Parser do
         subject.parse(header_parts.join)
       end
 
+      it 'full header without TLS upper case ID' do
+        expect(from_parser).to receive(:parse).with('from not.real.com ([10.0.0.1])')
+        expect(by_parser).to receive(:parse).with(' by baz.host (foo bar baz) with SMTP ID 702 ')
+        expect(for_parser).to receive(:parse).with('for <dummy@test.com>')
+
+        header_parts = [
+          'from not.real.com ([10.0.0.1]) ',
+          'by baz.host (foo bar baz) with SMTP ID 702 ',
+          'for <dummy@test.com>; ',
+          'Mon, 24 Aug 2020 06:15:49 -0700 (PDT)'
+        ]
+
+        subject.parse(header_parts.join)
+      end
+
+      it 'full header with TLS between from and by' do
+        expect(from_parser).to receive(:parse).with('from not.real.com (unknown [10.0.0.1])')
+        expect(by_parser).to receive(:parse).with('by foo.bar (Postfix) with ESMTPS id 51B365400F ')
+        expect(for_parser).to receive(:parse).with('for <dummy@test.com>')
+        expect(starttls_parser).to receive(:parse).with(
+          ' (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits)) ' +
+          '(No client certificate requested) '
+        )
+        expect(timestamp_parser).to receive(:parse).with(' Mon, 24 Aug 2020 06:15:48 -0700 (PDT)')
+
+        header_parts = [
+          'from not.real.com (unknown [10.0.0.1]) ',
+          '(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits)) ',
+          '(No client certificate requested) ',
+          'by foo.bar (Postfix) with ESMTPS id 51B365400F ',
+          'for <dummy@test.com>; ',
+          'Mon, 24 Aug 2020 06:15:48 -0700 (PDT)'
+        ]
+
+        subject.parse(header_parts.join)
+      end
+
       it 'classifies a header based on its values' do
         expect(classifier).to receive(:classify).with(
           {by: :output, for: :output, from: :output, starttls: :output, time: :output}

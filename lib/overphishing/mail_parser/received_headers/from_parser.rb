@@ -15,6 +15,7 @@ module Overphishing
             /from\s(?<advertised_sender>[\S]+)\s\((?<sender_host>\S+?)\.?\s\[(?<sender_ip>[^\]]+)\]\)/,
             /from\s(?<advertised_sender>\S+)\s\((?<sender_host>\S+?)\.?\s(?<sender_ip>\S+?)\)/,
             /from\s(?<advertised_sender>\S+)\s\(\[(?<sender_ip>[^\]]+)\]\)/,
+            /from\s(?<advertised_sender>\S+)\s\((?<sender_ip>[^)]+)\)/,
             /\(from\s(?<advertised_sender>[^)]+)\)/
           ]
 
