@@ -41,6 +41,8 @@ module Overphishing
 
           if scanner.check(/\(from\s+[^)]+\)/)
             from_part = scanner.scan(/\(from\s+[^)]+\)/)
+          elsif scanner.check(/from\s.+?\(HELO\s[^)]+\)\s\(\[[^\]]+\]\)/)
+            from_part = scanner.scan(/from.+?(?=by)/)
           elsif scanner.check(/from\s[^)(]+\sby/)
             from_part = scanner.scan(/from.+?(?=by)/)
           else
@@ -51,10 +53,12 @@ module Overphishing
             starttls_part = scanner.scan(/.+\s(?=by)/)
             by_part = scanner.scan(/\s?by.+?\sid\s[\S]+\s?/)
             for_part = scanner.scan(/for\s+\S+/)
-          else
+          elsif scanner.check(/\s?by.+?\s(id|ID)\s[\S]+\s?/)
             by_part = scanner.scan(/\s?by.+?\s(id|ID)\s[\S]+\s?/) unless scanner.eos?
             for_part = scanner.scan(/for\s+\S+/) unless scanner.eos?
             starttls_part = scanner.rest unless scanner.eos?
+          elsif scanner.check(/by.+(?!\sid)/)
+            by_part = scanner.scan(/.+/)
           end
 
           {

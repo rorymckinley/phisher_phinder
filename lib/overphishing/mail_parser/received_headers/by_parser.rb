@@ -19,6 +19,7 @@ module Overphishing
             /by\s(?<recipient>\S+)\s\((?<additional>[^)]+)\)\swith\s(?<protocol>.+)\sid\s(?<id>\S+)/,
             /by\s(?<recipient>\S+)\s\((?<additional>[^)]+)\)\swith\s(?<protocol>\S+)\sID\s(?<id>\S+)/,
             /by\s(?<recipient>\S+)\swith\s(?<protocol>.+)\sid\s(?<id>\S+)/,
+            /by\s(?<recipient>\S+)\swith\s(?<protocol>.+)/,
           ]
 
           matches = patterns.inject(nil) do |memo, pattern|
@@ -28,7 +29,7 @@ module Overphishing
           {
             recipient: enrich_recipient(matches[:recipient]),
             protocol: matches.names.include?('protocol') ? matches[:protocol]: nil,
-            id: matches[:id],
+            id: matches.names.include?('id') ? matches[:id]: nil,
             recipient_additional: matches.names.include?('additional') ? matches[:additional] : nil
           }
         end

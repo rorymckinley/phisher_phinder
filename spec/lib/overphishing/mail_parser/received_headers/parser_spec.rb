@@ -211,6 +211,20 @@ RSpec.describe Overphishing::MailParser::ReceivedHeaders::Parser do
         subject.parse(header_parts.join)
       end
 
+      it 'partial header with a HELO' do
+        expect(from_parser).to receive(:parse).with(
+          'from probably.not.real (HELO foo) ([10.0.0.1]) '
+        )
+        expect(by_parser).to receive(:parse).with('by recipient.zzz with ESMTP')
+        expect(timestamp_parser).to receive(:parse).with(' 10 Sep 2020 08:55:25 +1000')
+
+        header_parts = [
+          'from probably.not.real (HELO foo) ([10.0.0.1]) ',
+          'by recipient.zzz with ESMTP; 10 Sep 2020 08:55:25 +1000',
+        ]
+
+        subject.parse(header_parts.join)
+      end
       it 'classifies a header based on its values' do
         expect(classifier).to receive(:classify).with(
           {by: :output, for: :output, from: :output, starttls: :output, time: :output}

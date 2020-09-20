@@ -93,6 +93,7 @@ RSpec.describe Overphishing::MailParser::Parser do
         expect(parsed_complete_mail.tracing_headers[:received]).to eql([
           {
             advertised_sender: nil,
+            helo: nil,
             id: 'w17csp2701290oor',
             partial: true,
             protocol: 'SMTP',
@@ -105,6 +106,7 @@ RSpec.describe Overphishing::MailParser::Parser do
           },
           {
             advertised_sender: nil,
+            helo: nil,
             id: 'w6mr17215337plq.173.1587878045528',
             partial: true,
             protocol: 'SMTP',
@@ -117,6 +119,7 @@ RSpec.describe Overphishing::MailParser::Parser do
           },
           {
             advertised_sender: 'probably.not.real.com',
+            helo: nil,
             id: 'u23si16237783eds.526.2020.06.26.06.27.53',
             partial: false,
             protocol: 'ESMTPS',
@@ -129,6 +132,7 @@ RSpec.describe Overphishing::MailParser::Parser do
           },
           {
             advertised_sender: 'also.made.up',
+            helo: nil,
             id: '3gJek488nka743gKRkR2nY',
             partial: true,
             protocol: 'SMTP',
@@ -141,6 +145,7 @@ RSpec.describe Overphishing::MailParser::Parser do
           },
           {
             advertised_sender: 'not.real.com',
+            helo: nil,
             id: 'b201si8173212pfb.88.2020.04.25.22.14.05',
             partial: false,
             protocol: 'ESMTP',
@@ -153,6 +158,7 @@ RSpec.describe Overphishing::MailParser::Parser do
           },
           {
             advertised_sender: 'still.not.real.com',
+            helo: nil,
             id: nil,
             partial: true,
             protocol: nil,
@@ -165,6 +171,7 @@ RSpec.describe Overphishing::MailParser::Parser do
           },
           {
             advertised_sender: 'root@localhost',
+            helo: nil,
             id: '05QDRrso001911',
             partial: true,
             protocol: nil,

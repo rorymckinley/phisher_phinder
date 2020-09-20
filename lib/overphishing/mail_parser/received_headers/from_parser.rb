@@ -9,9 +9,10 @@ module Overphishing
         end
 
         def parse(component)
-          return {advertised_sender: nil, sender: nil} unless component
+          return {advertised_sender: nil, helo: nil, sender: nil} unless component
 
           patterns = [
+            /from\s(?<advertised_sender>[\S]+)\s\(HELO\s(?<helo>[^)]+)\)\s\(\[(?<sender_ip>[^\]]+)\]\)/,
             /from\s(?<advertised_sender>[\S]+)\s\((?<sender_host>\S+?)\.?\s\[(?<sender_ip>[^\]]+)\]\)/,
             /from\s(?<advertised_sender>\S+)\s\((?<sender_host>\S+?)\.?\s(?<sender_ip>\S+?)\)/,
             /from\s(?<advertised_sender>\S+)\s\(\[(?<sender_ip>[^\]]+)\]\)/,
@@ -26,6 +27,7 @@ module Overphishing
 
           {
             advertised_sender: matches[:advertised_sender],
+            helo: matches.names.include?('helo') ? matches[:helo] : nil,
             sender: {
               host: matches.names.include?('sender_host') ? matches[:sender_host] : nil,
               ip: matches.names.include?('sender_ip') ? @extended_ip_factory.build(matches[:sender_ip]) : nil

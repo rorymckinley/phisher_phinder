@@ -32,6 +32,9 @@ RSpec.describe Overphishing::MailParser::ReceivedHeaders::ByParser do
   let(:sample_7) do
     'by spam.test.zzz with local-generated (Exim 4.92) (envelope-from <is.this.real.zzz>) id 1kIXad-0006OQ-VE '
   end
+  let(:sample_8) do
+    'by host.test.zzz with ESMTP'
+  end
 
   subject  { described_class.new(enriched_ip_factory) }
 
@@ -101,6 +104,15 @@ RSpec.describe Overphishing::MailParser::ReceivedHeaders::ByParser do
       recipient_additional: nil,
       protocol: 'local-generated (Exim 4.92) (envelope-from <is.this.real.zzz>)',
       id: '1kIXad-0006OQ-VE'
+    })
+  end
+
+  it 'sample 8' do
+    expect(subject.parse(sample_8)).to eql({
+      recipient: 'host.test.zzz',
+      recipient_additional: nil,
+      protocol: 'ESMTP',
+      id: nil
     })
   end
 end
