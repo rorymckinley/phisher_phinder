@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 require 'spec_helper'
 
-RSpec.describe Overphishing::MailParser::ReceivedHeaders::ByParser do
-  let(:enriched_ip_1) { instance_double(Overphishing::ExtendedIp) }
+RSpec.describe PhisherPhinder::MailParser::ReceivedHeaders::ByParser do
+  let(:enriched_ip_1) { instance_double(PhisherPhinder::ExtendedIp) }
   let(:enriched_ip_factory) do
-    instance_double(Overphishing::ExtendedIpFactory).tap do |factory|
+    instance_double(PhisherPhinder::ExtendedIpFactory).tap do |factory|
       allow(factory).to receive(:build) do |arg|
         arg == '10.0.0.1' ? enriched_ip_1 : nil
       end

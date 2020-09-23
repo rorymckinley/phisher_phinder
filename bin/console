@@ -7,7 +7,7 @@ Dotenv.load('.env')
 require'sequel'
 DB = Sequel.connect(ENV.fetch('DATABASE_URL'))
 
-require "overphishing"
+require "phisher_phinder"
 
 # You can add fixtures and/or initialization code here to make experimenting
 # with your gem easier. You can also use a different console, if you like.

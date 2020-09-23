@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require 'spec_helper'
 
-RSpec.describe Overphishing::MailParser::ReceivedHeaders::Classifier  do
+RSpec.describe PhisherPhinder::MailParser::ReceivedHeaders::Classifier  do
   let(:complete_tls) do
     {
       advertised_sender: 'x', recipient_mailbox: 'y', recipient: 'z', protocol: 'ESMTPS', starttls: {}

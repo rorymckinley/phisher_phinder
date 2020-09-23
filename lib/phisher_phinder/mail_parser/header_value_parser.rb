@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Overphishing
+module PhisherPhinder
   module MailParser
     class HeaderValueParser
       def parse(raw_value)

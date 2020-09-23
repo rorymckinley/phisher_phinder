@@ -2,7 +2,7 @@
 require 'spec_helper'
 require 'base64'
 
-RSpec.describe Overphishing::MailParser::BodyParser do
+RSpec.describe PhisherPhinder::MailParser::BodyParser do
   let(:base64_transfer_encoding) { "base64" }
   let(:decoded_body) { "FooBar.\nBaz." }
   let(:encoded_body) { Base64.encode64(decoded_body) }

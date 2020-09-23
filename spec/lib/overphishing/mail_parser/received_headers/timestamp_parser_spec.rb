@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require 'spec_helper'
 
-RSpec.describe Overphishing::MailParser::ReceivedHeaders::TimestampParser do
+RSpec.describe PhisherPhinder::MailParser::ReceivedHeaders::TimestampParser do
   let(:sample_1) { 'Sat, 25 Apr 2020 22:14:04 -0700 (PDT)' }
   let(:sample_1_padded) { ' Sat, 25 Apr 2020 22:14:04 -0700 (PDT) ' }
   let(:sample_2) { 'Sat, 25 Apr 2020 22:14:05 -0700' }

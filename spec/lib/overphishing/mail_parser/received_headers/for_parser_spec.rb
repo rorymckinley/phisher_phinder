@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require 'spec_helper'
 
-RSpec.describe Overphishing::MailParser::ReceivedHeaders::ForParser do
+RSpec.describe PhisherPhinder::MailParser::ReceivedHeaders::ForParser do
   let(:sample_1) { 'for <dummy@test.com>' }
   let(:sample_2) { 'for dummy@test.com' }
 

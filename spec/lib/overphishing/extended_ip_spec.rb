@@ -1,12 +1,12 @@
 # frozen_string_literal: true
 require 'spec_helper'
 
-RSpec.describe Overphishing::ExtendedIp do
+RSpec.describe PhisherPhinder::ExtendedIp do
   let(:geoip_data_1) do
-    Overphishing::GeoipIpData.create(ip_address: '99.99.99.98')
+    PhisherPhinder::GeoipIpData.create(ip_address: '99.99.99.98')
   end
   let(:geoip_data_2) do
-    Overphishing::GeoipIpData.create(ip_address: '99.99.99.99')
+    PhisherPhinder::GeoipIpData.create(ip_address: '99.99.99.99')
   end
   let(:ip_address_1) { IPAddr.new('99.99.99.98') }
   let(:ip_address_2) { IPAddr.new('99.99.99.99') }

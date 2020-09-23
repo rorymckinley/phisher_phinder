@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Overphishing
+module PhisherPhinder
   class Mail
     attr_reader :original_email, :original_headers, :original_body, :headers, :tracing_headers, :body
 

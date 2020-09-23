@@ -1,8 +1,8 @@
-require_relative 'lib/overphishing/version'
+require_relative 'lib/phisher_phinder/version'
 
 Gem::Specification.new do |spec|
-  spec.name          = "overphishing"
-  spec.version       = Overphishing::VERSION
+  spec.name          = "phisher_phinder"
+  spec.version       = PhisherPhinder::VERSION
   spec.authors       = ["Rory McKinley"]
   spec.email         = ["rorymckinley@gmail.com"]
 
@@ -15,8 +15,8 @@ Gem::Specification.new do |spec|
   spec.metadata["allowed_push_host"] = "TODO: Set to 'http://mygemserver.com'"
 
   spec.metadata["homepage_uri"] = spec.homepage
-  spec.metadata["source_code_uri"] = "https://github.com/rorymckinley/overphishing"
-  spec.metadata["changelog_uri"] = "https://github.com/rorymckinley/overphishing/blob/master/CHANGELOG.md"
+  spec.metadata["source_code_uri"] = "https://github.com/rorymckinley/phisher_phinder"
+  spec.metadata["changelog_uri"] = "https://github.com/rorymckinley/phisher_phinder/blob/master/CHANGELOG.md"
 
   # Specify which files should be added to the gem when it is released.
   # The `git ls-files -z` loads the files in the RubyGem that have been added into git.

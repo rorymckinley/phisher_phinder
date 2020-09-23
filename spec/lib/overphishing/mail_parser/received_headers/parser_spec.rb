@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require 'spec_helper'
 
-RSpec.describe Overphishing::MailParser::ReceivedHeaders::Parser do
+RSpec.describe PhisherPhinder::MailParser::ReceivedHeaders::Parser do
   describe '#parse' do
     def build_parser_double(klass, key)
       double = instance_double(klass)
@@ -11,22 +11,22 @@ RSpec.describe Overphishing::MailParser::ReceivedHeaders::Parser do
       double
     end
     let(:by_parser) do
-      build_parser_double(Overphishing::MailParser::ReceivedHeaders::ByParser, :by)
+      build_parser_double(PhisherPhinder::MailParser::ReceivedHeaders::ByParser, :by)
     end
     let(:for_parser) do
-      build_parser_double(Overphishing::MailParser::ReceivedHeaders::ForParser, :for)
+      build_parser_double(PhisherPhinder::MailParser::ReceivedHeaders::ForParser, :for)
     end
     let(:from_parser) do
-      build_parser_double(Overphishing::MailParser::ReceivedHeaders::FromParser, :from)
+      build_parser_double(PhisherPhinder::MailParser::ReceivedHeaders::FromParser, :from)
     end
     let(:starttls_parser) do
-      build_parser_double(Overphishing::MailParser::ReceivedHeaders::StarttlsParser, :starttls)
+      build_parser_double(PhisherPhinder::MailParser::ReceivedHeaders::StarttlsParser, :starttls)
     end
     let(:timestamp_parser) do
-      build_parser_double(Overphishing::MailParser::ReceivedHeaders::TimestampParser, :time)
+      build_parser_double(PhisherPhinder::MailParser::ReceivedHeaders::TimestampParser, :time)
     end
     let(:classifier) do
-      instance_double(Overphishing::MailParser::ReceivedHeaders::Classifier, classify: {partial: true})
+      instance_double(PhisherPhinder::MailParser::ReceivedHeaders::Classifier, classify: {partial: true})
     end
 
     subject do

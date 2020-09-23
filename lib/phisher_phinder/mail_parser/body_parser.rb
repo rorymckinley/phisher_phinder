@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Overphishing
+module PhisherPhinder
   module MailParser
     class BodyParser
       def initialize(line_end)

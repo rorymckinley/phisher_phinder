@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require 'spec_helper'
 
-RSpec.describe Overphishing::CachedGeoipClient do
+RSpec.describe PhisherPhinder::CachedGeoipClient do
   let(:client) { instance_double(MaxMind::GeoIP2::Client, insights: insight) }
   let(:expiry_time) { Time.now - 60 }
   let(:insight) do
@@ -79,9 +79,9 @@ RSpec.describe Overphishing::CachedGeoipClient do
     end
 
     it 'persists a geoip ip data instance' do
-      expect { subject.lookup('1.1.1.1') }.to change(Overphishing::GeoipIpData, :count).by(1)
+      expect { subject.lookup('1.1.1.1') }.to change(PhisherPhinder::GeoipIpData, :count).by(1)
 
-      record = Overphishing::GeoipIpData.first
+      record = PhisherPhinder::GeoipIpData.first
 
       expect(record.ip_address).to eql '1.1.1.1'
       expect(record.location_accuracy_radius).to eql 20
@@ -112,7 +112,7 @@ RSpec.describe Overphishing::CachedGeoipClient do
     end
 
     it 'returns a persisted record rather than performing a lookup if a record exists' do
-      Overphishing::GeoipIpData.create(
+      PhisherPhinder::GeoipIpData.create(
         ip_address: '1.1.1.1', country_name: "People's Republic of Hout Bay", updated_at: expiry_time
       )
 
@@ -124,7 +124,7 @@ RSpec.describe Overphishing::CachedGeoipClient do
     end
 
     it 'replaces a persisted record if the record was last updated outside the expiry window' do
-      persisted_record = Overphishing::GeoipIpData.create(
+      persisted_record = PhisherPhinder::GeoipIpData.create(
         ip_address: '1.1.1.1', country_name: "People's Republic of Hout Bay"
       )
       persisted_record.this.update(updated_at: expiry_time - 1)
@@ -136,7 +136,7 @@ RSpec.describe Overphishing::CachedGeoipClient do
     end
 
     it 'replaces a persisted record if the record was last updated on the edge of the expiry window' do
-      persisted_record = Overphishing::GeoipIpData.create(
+      persisted_record = PhisherPhinder::GeoipIpData.create(
         ip_address: '1.1.1.1', country_name: "People's Republic of Hout Bay"
       )
       persisted_record.this.update(updated_at: expiry_time)
@@ -150,7 +150,7 @@ RSpec.describe Overphishing::CachedGeoipClient do
     it 'returns a record if it fetched a new record but the record data remained the same' do
       subject.lookup('1.1.1.1')
 
-      Overphishing::GeoipIpData.last.this.update(updated_at: expiry_time)
+      PhisherPhinder::GeoipIpData.last.this.update(updated_at: expiry_time)
 
       expect(subject.lookup('1.1.1.1')).to_not be_nil
     end
@@ -226,13 +226,13 @@ RSpec.describe Overphishing::CachedGeoipClient do
     it 'saves correctly when persisting for the first time', :aggregate_failures do
       expect { subject.lookup('1.1.1.1') }.to_not raise_error
 
-      expect(Overphishing::GeoipIpData.last.city_name).to be_nil
+      expect(PhisherPhinder::GeoipIpData.last.city_name).to be_nil
     end
 
     it 'saves correctly when updating the record', :aggregate_failures do
       expect { subject.lookup('1.1.1.1') }.to_not raise_error
 
-      Overphishing::GeoipIpData.last.this.update(updated_at: expiry_time)
+      PhisherPhinder::GeoipIpData.last.this.update(updated_at: expiry_time)
 
       expect { subject.lookup('1.1.1.1') }.to_not raise_error
     end

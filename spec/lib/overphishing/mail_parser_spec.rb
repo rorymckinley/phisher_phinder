@@ -1,20 +1,20 @@
 require 'spec_helper'
 require 'ipaddr'
 
-RSpec.describe Overphishing::MailParser::Parser do
+RSpec.describe PhisherPhinder::MailParser::Parser do
   let(:base64_mail_contents) { IO.read(File.join(FIXTURE_PATH, 'mail_base_64.txt')) }
   let(:complete_mail_contents) { IO.read(File.join(FIXTURE_PATH, 'mail_1.txt')) }
   let(:multipart_base64_mail_contents) { IO.read(File.join(FIXTURE_PATH, 'mail_base_64_multipart.txt')) }
   let(:simple_mail_contents) { IO.read(File.join(FIXTURE_PATH, 'mail_2.txt')) }
   let(:mail_with_utf8_subject_contents) { IO.read(File.join(FIXTURE_PATH, 'mail_utf8_subject.txt')) }
-  let(:enriched_ip_1) { instance_double(Overphishing::ExtendedIp) }
-  let(:enriched_ip_2) { instance_double(Overphishing::ExtendedIp) }
-  let(:enriched_ip_3) { instance_double(Overphishing::ExtendedIp) }
-  let(:enriched_ip_4) { instance_double(Overphishing::ExtendedIp) }
-  let(:enriched_ip_5) { instance_double(Overphishing::ExtendedIp) }
-  let(:enriched_ip_6) { instance_double(Overphishing::ExtendedIp) }
+  let(:enriched_ip_1) { instance_double(PhisherPhinder::ExtendedIp) }
+  let(:enriched_ip_2) { instance_double(PhisherPhinder::ExtendedIp) }
+  let(:enriched_ip_3) { instance_double(PhisherPhinder::ExtendedIp) }
+  let(:enriched_ip_4) { instance_double(PhisherPhinder::ExtendedIp) }
+  let(:enriched_ip_5) { instance_double(PhisherPhinder::ExtendedIp) }
+  let(:enriched_ip_6) { instance_double(PhisherPhinder::ExtendedIp) }
   let(:enriched_ip_factory) do
-    instance_double(Overphishing::ExtendedIpFactory).tap do |factory|
+    instance_double(PhisherPhinder::ExtendedIpFactory).tap do |factory|
       allow(factory).to receive(:build) do |arg|
         case arg
         when '2002:a4a:d031:0:0:0:0:0'

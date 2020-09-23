@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require 'spec_helper'
 
-RSpec.describe Overphishing::MailParser::HeaderValueParser do
+RSpec.describe PhisherPhinder::MailParser::HeaderValueParser do
   it 'strips off any padding' do
     expect(subject.parse(' foo  bar baz    ')).to eql 'foo  bar baz'
   end

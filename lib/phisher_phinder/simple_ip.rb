@@ -1,6 +1,6 @@
 # frozen_string_literal
 
-module Overphishing
+module PhisherPhinder
   class SimpleIp
     attr_reader :ip_address
 

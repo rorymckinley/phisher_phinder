@@ -1,4 +1,4 @@
-module Overphishing
+module PhisherPhinder
   class ExpandedDataProcessor
     def process(mail)
       {

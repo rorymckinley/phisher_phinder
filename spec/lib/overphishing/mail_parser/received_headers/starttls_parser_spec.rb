@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require 'spec_helper'
 
-RSpec.describe Overphishing::MailParser::ReceivedHeaders::StarttlsParser do
+RSpec.describe PhisherPhinder::MailParser::ReceivedHeaders::StarttlsParser do
   let(:sample_1) { '(version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128)' }
   let(:sample_2) do
     ' (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits)) ' +

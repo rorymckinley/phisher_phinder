@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Overphishing
+module PhisherPhinder
   class ExtendedIp
     attr_reader :ip_address, :geoip_ip_data
 

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Overphishing
+module PhisherPhinder
   class BodyHyperlink
     attr_reader :href, :text, :type, :raw_href
 

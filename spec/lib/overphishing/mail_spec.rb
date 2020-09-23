@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require 'spec_helper'
 
-RSpec.describe Overphishing::Mail do
+RSpec.describe PhisherPhinder::Mail do
   let(:base_headers) do
     {
       original_email: '',
@@ -37,8 +37,8 @@ RSpec.describe Overphishing::Mail do
     mail = described_class.new(**base_headers.merge(body: {html: html_body, text: 'Foo'}))
 
     expect(mail.hypertext_links.length).to eql 2
-    expect(mail.hypertext_links.first).to eq Overphishing::BodyHyperlink.new('http://foo', 'Click Me!')
-    expect(mail.hypertext_links.last).to eq Overphishing::BodyHyperlink.new('http://bar', 'No, click me!')
+    expect(mail.hypertext_links.first).to eq PhisherPhinder::BodyHyperlink.new('http://foo', 'Click Me!')
+    expect(mail.hypertext_links.last).to eq PhisherPhinder::BodyHyperlink.new('http://bar', 'No, click me!')
   end
 
   it 'ignores hyperlinks that do not have an href' do
@@ -46,8 +46,8 @@ RSpec.describe Overphishing::Mail do
     mail = described_class.new(**base_headers.merge(body: {html: html_body, text: 'Foo'}))
 
     expect(mail.hypertext_links.length).to eql 2
-    expect(mail.hypertext_links.first).to eq Overphishing::BodyHyperlink.new('http://foo', 'Click Me!')
-    expect(mail.hypertext_links.last).to eq Overphishing::BodyHyperlink.new('http://bar', 'No, click me!')
+    expect(mail.hypertext_links.first).to eq PhisherPhinder::BodyHyperlink.new('http://foo', 'Click Me!')
+    expect(mail.hypertext_links.last).to eq PhisherPhinder::BodyHyperlink.new('http://bar', 'No, click me!')
   end
 
   it 'returns an empty collection if there is no content that is classified as HTML' do

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require 'ipaddr'
 
-module Overphishing
+module PhisherPhinder
   class ExtendedIpFactory
     def initialize(geoip_client:)
       @geoip_client = geoip_client

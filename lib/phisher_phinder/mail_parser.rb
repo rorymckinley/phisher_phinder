@@ -2,7 +2,7 @@
 require_relative('mail_parser/body_parser')
 require_relative('mail_parser/header_value_parser')
 
-module Overphishing
+module PhisherPhinder
   module MailParser
     class Parser
       def initialize(enriched_ip_factory, line_ending_type)

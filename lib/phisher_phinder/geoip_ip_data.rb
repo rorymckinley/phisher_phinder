@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Overphishing
+module PhisherPhinder
   class GeoipIpData < Sequel::Model(:geoip_ip_data)
   end
 end

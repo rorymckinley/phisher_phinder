@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require 'uri'
 
-RSpec.describe Overphishing::BodyHyperlink do
+RSpec.describe PhisherPhinder::BodyHyperlink do
   it 'indicates the type of link' do
     expect(described_class.new('https://foo/bar', '').type).to eql :url
     expect(described_class.new('https://foo/bar#baz', '').type).to eql :url

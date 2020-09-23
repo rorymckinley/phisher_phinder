@@ -2,7 +2,7 @@
 require 'spec_helper'
 require 'uri'
 
-RSpec.describe Overphishing::ExpandedDataProcessor do
+RSpec.describe PhisherPhinder::ExpandedDataProcessor do
   let(:html_body) do
     '<html>' +
       '<a href="http://foo">Foo</a>' +
@@ -15,7 +15,7 @@ RSpec.describe Overphishing::ExpandedDataProcessor do
       '</html>'
   end
   let(:mail) do
-    Overphishing::Mail.new(
+    PhisherPhinder::Mail.new(
       original_email: '',
       original_headers: '',
       original_body: '',

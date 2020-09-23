@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Overphishing
+module PhisherPhinder
   class CachedGeoipClient
     def initialize(client, expiry_time)
       @client = client
@@ -20,7 +20,7 @@ module Overphishing
     private
 
     def retrieve_cached_record(ip_address)
-      Overphishing::GeoipIpData.first(ip_address: ip_address)
+      PhisherPhinder::GeoipIpData.first(ip_address: ip_address)
     end
 
     def cached_record_valid?(cached_record)
@@ -61,7 +61,7 @@ module Overphishing
 
         cached_record
       else
-        Overphishing::GeoipIpData.create(
+        PhisherPhinder::GeoipIpData.create(
           ip_address: ip_address,
           location_accuracy_radius: lookup_result.location.accuracy_radius,
           latitude: lookup_result.location.latitude,
