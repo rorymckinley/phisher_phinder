@@ -75,6 +75,5 @@ RSpec.describe PhisherPhinder::MailParser::BodyParser do
       text: multipart_alternative_text_body,
       html: multipart_alternative_html_body,
     })
-
   end
 end
