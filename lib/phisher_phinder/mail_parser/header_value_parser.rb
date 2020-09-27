@@ -4,35 +4,36 @@ module PhisherPhinder
   module MailParser
     class HeaderValueParser
       def parse(raw_value)
-        if utf_8_preambles?(raw_value)
-          (raw_value.split(' ').map { |snippet| parse_utf8_base64(snippet) }).join
-        elsif windows_1251_preambles?(raw_value)
-          (raw_value.split(' ').map { |snippet| parse_windows_1251_base64(snippet) }).join
+        stripped_value = raw_value.strip
+        if encoded?(stripped_value)
+          stripped_value.split(' ').inject('') do |decoded, part|
+            matches = part.match(/\A=\?(?<character_set>.+)\?(?<encoding>.)\?(?<content>.+)\z/)
+
+            unencoded_content = if matches[:encoding].downcase == 'b'
+                                  Base64.decode64(matches[:content])
+                                elsif matches[:encoding].downcase == 'q'
+                                  matches[:content].unpack('M').first
+                                end
+
+            content = if matches[:character_set] =~ /iso-8859-1/i
+                        unencoded_content.force_encoding('ISO-8859-1').encode('UTF-8')
+                      elsif matches[:character_set] =~ /windows-1251/i
+                        unencoded_content.force_encoding('cp1251').encode('UTF-8')
+                      elsif matches[:character_set] =~ /utf-8/i
+                        unencoded_content.force_encoding('UTF-8')
+                      end
+
+            decoded += content
+          end
         else
-          raw_value.strip
+          stripped_value
         end
       end
 
       private
 
-      def utf_8_preambles?(raw_value)
-        raw_value.scan(/=\?UTF-8\?b\?/).any?
-      end
-
-      def windows_1251_preambles?(raw_value)
-        raw_value.scan(/=\?windows-1251\?B\?/).any?
-      end
-
-      def parse_utf8_base64(raw_value)
-        require 'base64'
-
-        Base64.decode64(raw_value.strip.sub(/=\?UTF-8\?b\?/, '')).force_encoding('UTF-8')
-      end
-
-      def parse_windows_1251_base64(raw_value)
-        require 'base64'
-
-        Base64.decode64(raw_value.strip.sub(/=\?windows-1251\?B\?/, '')).force_encoding('cp1251').encode('UTF-8')
+      def encoded?(raw_value)
+        raw_value =~ /=\?[a-z1-9-]+\?[bq]/i
       end
     end
   end
