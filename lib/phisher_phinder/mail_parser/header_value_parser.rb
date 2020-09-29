@@ -5,9 +5,13 @@ module PhisherPhinder
     class HeaderValueParser
       def parse(raw_value)
         stripped_value = raw_value.strip
-        if encoded?(stripped_value)
-          stripped_value.split(' ').inject('') do |decoded, part|
-            matches = part.match(/\A=\?(?<character_set>.+)\?(?<encoding>.)\?(?<content>.+)\z/)
+        words = stripped_value.split(' ')
+        words.map do |word|
+          # require 'pry'
+          # binding.pry
+          if encoded?(word)
+            # binding.pry
+            matches = word.match(/\A=\?(?<character_set>.+)\?(?<encoding>.)\?(?<content>.+)\z/)
 
             unencoded_content = if matches[:encoding].downcase == 'b'
                                   Base64.decode64(matches[:content])
@@ -22,12 +26,14 @@ module PhisherPhinder
                       elsif matches[:character_set] =~ /utf-8/i
                         unencoded_content.force_encoding('UTF-8')
                       end
-
-            decoded += content
+            # stripped_value.split(' ').inject('') do |decoded, part|
+            #
+            #   decoded += content
+            # end
+          else
+            word
           end
-        else
-          stripped_value
-        end
+        end.join(' ')
       end
 
       private

@@ -208,7 +208,7 @@ RSpec.describe PhisherPhinder::MailParser::Parser do
 
       it 'has a decoded subject if the original subject was UTF-8 Base64 encoded' do
         subject = parsed_mail_utf8_subject.headers[:subject][:data]
-        expect(subject).to eql 'foõßæÞ'
+        expect(subject).to eql 'foõ ßæÞ'
       end
     end
   end
