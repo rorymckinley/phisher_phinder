@@ -41,7 +41,7 @@ module PhisherPhinder
 
           if scanner.check(/\(from\s+[^)]+\)/)
             from_part = scanner.scan(/\(from\s+[^)]+\)/)
-          elsif scanner.check(/from\s.+?\(HELO\s[^)]+\)\s\(\[[^\]]+\]\)/)
+          elsif scanner.check(/from\s.+?\(HELO\s[^)]+\)\s\([^\)]*?\)/)
             from_part = scanner.scan(/from.+?(?=by)/)
           elsif scanner.check(/from\s[^)(]+\sby/)
             from_part = scanner.scan(/from.+?(?=by)/)

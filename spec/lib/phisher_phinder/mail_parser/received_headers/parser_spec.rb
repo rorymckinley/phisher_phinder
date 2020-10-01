@@ -225,6 +225,22 @@ RSpec.describe PhisherPhinder::MailParser::ReceivedHeaders::Parser do
 
         subject.parse(header_parts.join)
       end
+
+      it 'partial header with from and by no IP data provided', :aggregate_failures do
+        expect(from_parser).to receive(:parse).with(
+          'from probably.not.real (HELO foo) () '
+        )
+        expect(by_parser).to receive(:parse).with('by recipient.zzz with SMTP')
+        expect(timestamp_parser).to receive(:parse).with(' Sat, 26 Sep 2020 20:44:35 +0200')
+
+        header_parts = [
+          'from probably.not.real (HELO foo) () ',
+          'by recipient.zzz with SMTP; Sat, 26 Sep 2020 20:44:35 +0200'
+        ]
+
+        subject.parse(header_parts.join)
+      end
+
       it 'classifies a header based on its values' do
         expect(classifier).to receive(:classify).with(
           {by: :output, for: :output, from: :output, starttls: :output, time: :output}

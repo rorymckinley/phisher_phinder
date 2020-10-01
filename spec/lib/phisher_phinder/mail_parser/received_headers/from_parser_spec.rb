@@ -29,6 +29,7 @@ RSpec.describe PhisherPhinder::MailParser::ReceivedHeaders::FromParser do
   let(:sample_5) { 'from not.real.com (10.0.0.7)' }
   let(:sample_6) { 'from root ' }
   let(:sample_7) { 'from probably.not.real (HELO foo) ([10.0.0.3])' }
+  let(:sample_8) { 'from probably.not.real (HELO foo) () ' }
 
   subject { described_class.new(enriched_ip_factory) }
 
@@ -111,6 +112,17 @@ RSpec.describe PhisherPhinder::MailParser::ReceivedHeaders::FromParser do
       sender: {
         host: nil,
         ip: enriched_ip_1
+      }
+    })
+  end
+
+  it 'sample 8' do
+    expect(subject.parse(sample_8)).to eql({
+      advertised_sender: 'probably.not.real',
+      helo: 'foo',
+      sender: {
+        host: nil,
+        ip: nil
       }
     })
   end

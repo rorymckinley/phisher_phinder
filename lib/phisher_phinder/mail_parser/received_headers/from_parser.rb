@@ -12,6 +12,7 @@ module PhisherPhinder
           return {advertised_sender: nil, helo: nil, sender: nil} unless component
 
           patterns = [
+            /from\s(?<advertised_sender>[\S]+)\s\(HELO\s(?<helo>[^)]+)\)\s\(\)/,
             /from\s(?<advertised_sender>[\S]+)\s\(HELO\s(?<helo>[^)]+)\)\s\(\[(?<sender_ip>[^\]]+)\]\)/,
             /from\s(?<advertised_sender>[\S]+)\s\((?<sender_host>\S+?)\.?\s\[(?<sender_ip>[^\]]+)\]\)/,
             /from\s(?<advertised_sender>\S+)\s\((?<sender_host>\S+?)\.?\s(?<sender_ip>\S+?)\)/,
