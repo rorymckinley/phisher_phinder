@@ -35,12 +35,15 @@ RSpec.describe PhisherPhinder::MailParser::ReceivedHeaders::ByParser do
   let(:sample_8) do
     'by host.test.zzz with ESMTP'
   end
+  let(:sample_9) do
+    ' by host.test.zzz (9.0.032.02) (authenticated as foo@test.zzz) id 5F638B8500006DAA'
+  end
 
   subject  { described_class.new(enriched_ip_factory) }
 
   it 'nil' do
     expect(subject.parse(nil)).to eql({
-      recipient: nil, recipient_additional: nil, protocol: nil, id: nil
+      recipient: nil, recipient_additional: nil, authenticated_as: nil, protocol: nil, id: nil
     })
   end
 
@@ -48,6 +51,7 @@ RSpec.describe PhisherPhinder::MailParser::ReceivedHeaders::ByParser do
     expect(subject.parse(sample_1)).to eql({
       recipient: 'mx.google.com',
       recipient_additional: nil,
+      authenticated_as: nil,
       protocol: 'ESMTPS',
       id: 'u23si16237783eds.526.2020.06.26.06.27.53',
     })
@@ -58,6 +62,7 @@ RSpec.describe PhisherPhinder::MailParser::ReceivedHeaders::ByParser do
       recipient: 'still.dodgy.host.com',
       protocol: nil,
       recipient_additional: '8.14.7/8.14.7/Submit',
+      authenticated_as: nil,
       id: '05QDRrso001911',
     })
   end
@@ -66,6 +71,7 @@ RSpec.describe PhisherPhinder::MailParser::ReceivedHeaders::ByParser do
     expect(subject.parse(sample_3)).to eql({
       recipient: enriched_ip_1,
       recipient_additional: 'Fuzzy Corp',
+      authenticated_as: nil,
       protocol: 'SMTP',
       id: '3gJek488nka743gKRkR2nY',
     })
@@ -75,6 +81,7 @@ RSpec.describe PhisherPhinder::MailParser::ReceivedHeaders::ByParser do
     expect(subject.parse(sample_4)).to eql({
       recipient: 'mx.google.com',
       recipient_additional: '8.14.7/8.14.7',
+      authenticated_as: nil,
       protocol: 'ESMTP',
       id: 'b201si8173212pfb.88.2020.04.25.22.14.05'
     })
@@ -84,6 +91,7 @@ RSpec.describe PhisherPhinder::MailParser::ReceivedHeaders::ByParser do
     expect(subject.parse(sample_5)).to eql({
       recipient: 'dodgy.host.zzz',
       recipient_additional: '10.0.0.1',
+      authenticated_as: nil,
       protocol: 'Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384)',
       id: '15.1.2044.4'
     })
@@ -93,6 +101,7 @@ RSpec.describe PhisherPhinder::MailParser::ReceivedHeaders::ByParser do
     expect(subject.parse(sample_6)).to eql({
       recipient: 'dodgy.host.zzz',
       recipient_additional: 'DODGY SMTP Server 2.3.2',
+      authenticated_as: nil,
       protocol: 'SMTP',
       id: '702'
     })
@@ -102,6 +111,7 @@ RSpec.describe PhisherPhinder::MailParser::ReceivedHeaders::ByParser do
     expect(subject.parse(sample_7)).to eql({
       recipient: 'spam.test.zzz',
       recipient_additional: nil,
+      authenticated_as: nil,
       protocol: 'local-generated (Exim 4.92) (envelope-from <is.this.real.zzz>)',
       id: '1kIXad-0006OQ-VE'
     })
@@ -111,8 +121,19 @@ RSpec.describe PhisherPhinder::MailParser::ReceivedHeaders::ByParser do
     expect(subject.parse(sample_8)).to eql({
       recipient: 'host.test.zzz',
       recipient_additional: nil,
+      authenticated_as: nil,
       protocol: 'ESMTP',
       id: nil
+    })
+  end
+
+  it 'sample 9' do
+    expect(subject.parse(sample_9)).to eql({
+      recipient: 'host.test.zzz',
+      recipient_additional: '9.0.032.02',
+      authenticated_as: 'foo@test.zzz',
+      protocol: nil,
+      id: '5F638B8500006DAA'
     })
   end
 end

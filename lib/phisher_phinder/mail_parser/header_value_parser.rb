@@ -7,10 +7,7 @@ module PhisherPhinder
         stripped_value = raw_value.strip
         words = stripped_value.split(' ')
         words.map do |word|
-          # require 'pry'
-          # binding.pry
           if encoded?(word)
-            # binding.pry
             matches = word.match(/\A=\?(?<character_set>.+)\?(?<encoding>.)\?(?<content>.+)\z/)
 
             unencoded_content = if matches[:encoding].downcase == 'b'
@@ -26,10 +23,6 @@ module PhisherPhinder
                       elsif matches[:character_set] =~ /utf-8/i
                         unencoded_content.force_encoding('UTF-8')
                       end
-            # stripped_value.split(' ').inject('') do |decoded, part|
-            #
-            #   decoded += content
-            # end
           else
             word
           end
