@@ -97,7 +97,7 @@ RSpec.describe PhisherPhinder::MailParser::Body::BlockClassifier do
 
     it 'returns the content for the block' do
       expect(subject.classify_block(text_utf_8_base64)[:content]).to eql(
-        "VGhpcyBpcyB0aGUgZmlyc3QgcGFydCBvZiB0aGUgdGV4dCBib2R5LgpJdCBj" +
+        "VGhpcyBpcyB0aGUgZmlyc3QgcGFydCBvZiB0aGUgdGV4dCBib2R5LgpJdCBj\n" +
         "b250YWlucyBtb3JlIHRoYW4gb25lIGxpbmUu"
       )
       expect(subject.classify_block(no_headers)[:content]).to eql 'FooBarBaz'

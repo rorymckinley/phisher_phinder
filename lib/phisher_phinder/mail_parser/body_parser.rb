@@ -12,7 +12,7 @@ module PhisherPhinder
           parse_multipart_alternative(content_type, body_contents)
         else
           classifier = Body::BlockClassifier.new(@line_end)
-          parser = Body::BlockParser.new
+          parser = Body::BlockParser.new(@line_end)
 
           classification = classifier.classify_headers(
             content_type: content_type, content_transfer_encoding: content_transfer_encoding
@@ -73,7 +73,7 @@ module PhisherPhinder
 
       def categorise_blocks(blocks)
         classifier = Body::BlockClassifier.new(@line_end)
-        parser = Body::BlockParser.new
+        parser = Body::BlockParser.new(@line_end)
         blocks.map do |block|
           classification = classifier.classify_block(block)
           contents = parser.parse(classification)

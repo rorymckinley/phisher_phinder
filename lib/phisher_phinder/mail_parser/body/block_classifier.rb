@@ -31,7 +31,7 @@ module PhisherPhinder
             end
           end
 
-          output[:content] = lines.join
+          output[:content] = lines.join(@line_end)
 
           output
         end

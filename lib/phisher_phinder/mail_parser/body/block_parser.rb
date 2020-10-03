@@ -4,6 +4,10 @@ module PhisherPhinder
   module MailParser
     module Body
       class BlockParser
+        def initialize(line_end)
+          @line_end = line_end
+        end
+
         def parse(block_data)
           encoding = block_data[:content_transfer_encoding] || :seven_bit
 
@@ -18,8 +22,14 @@ module PhisherPhinder
               decoded.force_encoding('cp1251').encode('UTF-8')
             end
           when :quoted_printable
-            block_data[:content].unpack('M').first.force_encoding('UTF-8')
+            remove_troublesome_sequences(block_data[:content]).unpack('M').first.force_encoding('UTF-8')
           end
+        end
+
+        private
+
+        def remove_troublesome_sequences(content)
+          content.gsub(/=((?:[^a-f0-9#{@line_end}])|(?:[a-f0-9][^a-f0-9]))/i, '=3D\1')
         end
       end
     end
