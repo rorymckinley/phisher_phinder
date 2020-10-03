@@ -51,7 +51,7 @@ module PhisherPhinder
       end
 
       def parse_multipart_alternative(content_type, contents)
-        base_boundary = content_type.split(';').last.strip.split('=').last
+        base_boundary = content_type.split(';').last.strip.split('=').last.gsub(/"/, '')
         start_boundary = '--' + base_boundary + @line_end
         end_boundary = '--' + base_boundary + '--'
 

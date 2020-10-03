@@ -1,0 +1,12 @@
+
+
+This should be ignored
+--boundary-foo-bar-baz
+Content-Type: text/html; charset=utf-8
+Content-Transfer-Encoding: base64
+
+VGhpcyBpcyB0aGUgZmlyc3QgcGFydCBvZiB0aGUgSFRNTCBib2R5LgpJdCBj
+b250YWlucyBtb3JlIHRoYW4gb25lIGxpbmUu
+
+--boundary-foo-bar-baz--
+This should be ignored.
