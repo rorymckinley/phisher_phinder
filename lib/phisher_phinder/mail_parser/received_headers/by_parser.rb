@@ -20,6 +20,12 @@ module PhisherPhinder
           end
 
           patterns = [
+            %r{by\s(?<recipient>\S+)\s
+             \((?<additional>[^)]+)\)\s
+             with\sMicrosoft\sSMTP\sServer\s\([^\)]+\)\s
+             id\s(?<id>\S+)\s
+             via\s(?<protocol>Frontend\sTransport)
+            }x,
             /by\s(?<recipient>\S+)\swith\s(?<protocol>\S+)\sid\s(?<id>\S+)/,
             /by\s(?<recipient>\S+)\s\((?<additional>[^)]+)\)\swith\s(?<protocol>\S+)\sid\s(?<id>\S+)/,
             /by\s(?<recipient>\S+)\s(?<additional>.+)\swith\s(?<protocol>\S+)\sid\s(?<id>\S+)/,
@@ -28,7 +34,7 @@ module PhisherPhinder
             /by\s(?<recipient>\S+)\s\((?<additional>[^)]+)\)\swith\s(?<protocol>\S+)\sID\s(?<id>\S+)/,
             /by\s(?<recipient>\S+)\swith\s(?<protocol>.+)\sid\s(?<id>\S+)/,
             /by\s(?<recipient>\S+)\swith\s(?<protocol>.+)/,
-            /by\s(?<recipient>\S+)\s\((?<additional>[^)]+)\)\s\(authenticated as (?<authenticated_as>[^\)]+)\)\sid\s(?<id>\S+)/
+            /by\s(?<recipient>\S+)\s\((?<additional>[^)]+)\)\s\(authenticated as (?<authenticated_as>[^\)]+)\)\sid\s(?<id>\S+)/,
           ]
 
           matches = patterns.inject(nil) do |memo, pattern|

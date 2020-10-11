@@ -38,6 +38,11 @@ RSpec.describe PhisherPhinder::MailParser::ReceivedHeaders::ByParser do
   let(:sample_9) do
     ' by host.test.zzz (9.0.032.02) (authenticated as foo@test.zzz) id 5F638B8500006DAA'
   end
+  let(:sample_10) do
+    ' by host.test.zzz (10.10.10.10) with Microsoft SMTP Server ' +
+      '(version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 1.2.3.4 ' +
+      'via Frontend Transport'
+  end
 
   subject  { described_class.new(enriched_ip_factory) }
 
@@ -134,6 +139,16 @@ RSpec.describe PhisherPhinder::MailParser::ReceivedHeaders::ByParser do
       authenticated_as: 'foo@test.zzz',
       protocol: nil,
       id: '5F638B8500006DAA'
+    })
+  end
+
+  it 'sample 10' do
+    expect(subject.parse(sample_10)).to eql({
+      recipient: 'host.test.zzz',
+      recipient_additional: '10.10.10.10',
+      authenticated_as: nil,
+      protocol: 'Frontend Transport',
+      id: '1.2.3.4'
     })
   end
 end

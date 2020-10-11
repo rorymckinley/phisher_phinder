@@ -53,6 +53,9 @@ module PhisherPhinder
             starttls_part = scanner.scan(/.+\s(?=by)/)
             by_part = scanner.scan(/\s?by.+?\sid\s[\S]+\s?/)
             for_part = scanner.scan(/for\s+\S+/)
+          elsif scanner.check(/\s?by.*with Microsoft SMTP Server.*id.*via Frontend Transport/)
+            by_part = scanner.scan(/\sby.*Frontend Transport/)
+            starttls_part = by_part
           elsif scanner.check(/\s?by.+?\s(id|ID)\s[\S]+\s?/)
             by_part = scanner.scan(/\s?by.+?\s(id|ID)\s[\S]+\s?/) unless scanner.eos?
             for_part = scanner.scan(/for\s+\S+/) unless scanner.eos?

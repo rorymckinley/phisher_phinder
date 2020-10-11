@@ -9,6 +9,7 @@ module PhisherPhinder
 
           patterns = [
             /\(version=(?<version>\S+)\scipher=(?<cipher>\S+)\sbits=(?<bits>\S+)\)/,
+            /\(version=(?<version>\S+),\scipher=(?<cipher>\S+)\)/,
             /using\s(?<version>\S+)\swith cipher\s(?<cipher>\S+)\s\((?<bits>.+?) bits\)/
           ]
 
@@ -16,7 +17,13 @@ module PhisherPhinder
             memo || component.match(pattern)
           end
 
-          {starttls: {version: matches[:version], cipher: matches[:cipher], bits: matches[:bits]}}
+          {
+            starttls: {
+              version: matches[:version],
+              cipher: matches[:cipher],
+              bits: matches.names.include?('bits') ? matches[:bits] : nil,
+            }
+          }
         end
       end
     end

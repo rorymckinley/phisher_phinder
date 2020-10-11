@@ -241,6 +241,30 @@ RSpec.describe PhisherPhinder::MailParser::ReceivedHeaders::Parser do
         subject.parse(header_parts.join)
       end
 
+      it 'TLS partial via frontend transport' do
+        expect(from_parser).to receive(:parse).with('from probably.not.real (10.0.0.1)')
+        expect(by_parser).to receive(:parse).with(
+          ' by recipient.zzz (10.10.10.10) with Microsoft SMTP Server ' +
+          '(version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 1.2.3.4 ' +
+          'via Frontend Transport'
+        )
+        expect(starttls_parser).to receive(:parse).with(
+          ' by recipient.zzz (10.10.10.10) with Microsoft SMTP Server ' +
+          '(version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 1.2.3.4 ' +
+          'via Frontend Transport'
+        )
+        expect(timestamp_parser).to receive(:parse).with(' Fri, 4 Sep 2020 06:16:15 +0000')
+
+        header_parts = [
+          'from probably.not.real (10.0.0.1) ',
+          'by recipient.zzz (10.10.10.10) with Microsoft SMTP Server ',
+          '(version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 1.2.3.4 ',
+          'via Frontend Transport; Fri, 4 Sep 2020 06:16:15 +0000'
+        ]
+
+        subject.parse(header_parts.join)
+      end
+
       it 'classifies a header based on its values' do
         expect(classifier).to receive(:classify).with(
           {by: :output, for: :output, from: :output, starttls: :output, time: :output}
