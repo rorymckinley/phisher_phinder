@@ -52,13 +52,13 @@ module PhisherPhinder
           if scanner.check(/.+\S+\s+by/)
             starttls_part = scanner.scan(/.+\s(?=by)/)
             by_part = scanner.scan(/\s?by.+?\sid\s[\S]+\s?/)
-            for_part = scanner.scan(/for\s+\S+/)
+            for_part = for_scan(scanner)
           elsif scanner.check(/\s?by.*with Microsoft SMTP Server.*id.*via Frontend Transport/)
             by_part = scanner.scan(/\sby.*Frontend Transport/)
             starttls_part = by_part
           elsif scanner.check(/\s?by.+?\s(id|ID)\s[\S]+\s?/)
             by_part = scanner.scan(/\s?by.+?\s(id|ID)\s[\S]+\s?/) unless scanner.eos?
-            for_part = scanner.scan(/for\s+\S+/) unless scanner.eos?
+            for_part = for_scan(scanner)
             starttls_part = scanner.rest unless scanner.eos?
           elsif scanner.check(/by.+(?!\sid)/)
             by_part = scanner.scan(/.+/)
@@ -70,6 +70,12 @@ module PhisherPhinder
             from: from_part,
             starttls: starttls_part
           }
+        end
+
+        def for_scan(scanner)
+          return nil if scanner.eos?
+
+          scanner.check(/for\s<[^>]+>/) ? scanner.scan(/for\s<[^>]+>/) : scanner.scan(/for\s+\S+/)
         end
       end
     end

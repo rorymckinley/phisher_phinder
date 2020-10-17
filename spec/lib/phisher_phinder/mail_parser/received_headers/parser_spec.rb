@@ -265,6 +265,26 @@ RSpec.describe PhisherPhinder::MailParser::ReceivedHeaders::Parser do
         subject.parse(header_parts.join)
       end
 
+      it 'mangled and rearranged header' do
+        expect(from_parser).to receive(:parse).with('from localhost (127.0.0.1)')
+        expect(by_parser).to receive(:parse).with(' by recipient.zzz id SSP82XUF8U4ERPFZGJN4K1M20 ')
+        expect(for_parser).to receive(:parse).with('for < victim@test.com >')
+        expect(timestamp_parser).to receive(:parse).with(
+          ' Sun, 04 Oct 2020 00:36:09 -0400 -+00:00 -0400 (EST) ' +
+          '(envelope-from < ""Please respond" <DDYVOWO@overpol.com>" <admin@recipient.zzz> >)'
+        )
+
+        header_parts = [
+          'from localhost (127.0.0.1) ',
+          'by recipient.zzz id SSP82XUF8U4ERPFZGJN4K1M20 ',
+          'for < victim@test.com >; ',
+          'Sun, 04 Oct 2020 00:36:09 -0400 -+00:00 -0400 (EST) ',
+          '(envelope-from < ""Please respond" <DDYVOWO@overpol.com>" <admin@recipient.zzz> >)'
+        ]
+
+        subject.parse(header_parts.join)
+      end
+
       it 'classifies a header based on its values' do
         expect(classifier).to receive(:classify).with(
           {by: :output, for: :output, from: :output, starttls: :output, time: :output}
