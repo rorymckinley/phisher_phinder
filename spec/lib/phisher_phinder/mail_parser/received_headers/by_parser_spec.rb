@@ -46,12 +46,13 @@ RSpec.describe PhisherPhinder::MailParser::ReceivedHeaders::ByParser do
   let(:sample_11) do
     ' by host.test.zzz id SSP82XUF8U4ERPFZGJN4K1M20 '
   end
+  let(:starttls_parser) { PhisherPhinder::MailParser::ReceivedHeaders::StarttlsParser.new }
 
-  subject  { described_class.new(enriched_ip_factory) }
+  subject  { described_class.new(ip_factory: enriched_ip_factory, starttls_parser: starttls_parser) }
 
   it 'nil' do
     expect(subject.parse(nil)).to eql({
-      recipient: nil, recipient_additional: nil, authenticated_as: nil, protocol: nil, id: nil
+      recipient: nil, recipient_additional: nil, authenticated_as: nil, protocol: nil, id: nil, starttls: nil
     })
   end
 
@@ -62,6 +63,7 @@ RSpec.describe PhisherPhinder::MailParser::ReceivedHeaders::ByParser do
       authenticated_as: nil,
       protocol: 'ESMTPS',
       id: 'u23si16237783eds.526.2020.06.26.06.27.53',
+      starttls: nil,
     })
   end
 
@@ -72,6 +74,7 @@ RSpec.describe PhisherPhinder::MailParser::ReceivedHeaders::ByParser do
       recipient_additional: '8.14.7/8.14.7/Submit',
       authenticated_as: nil,
       id: '05QDRrso001911',
+      starttls: nil,
     })
   end
 
@@ -82,6 +85,7 @@ RSpec.describe PhisherPhinder::MailParser::ReceivedHeaders::ByParser do
       authenticated_as: nil,
       protocol: 'SMTP',
       id: '3gJek488nka743gKRkR2nY',
+      starttls: nil,
     })
   end
 
@@ -91,7 +95,8 @@ RSpec.describe PhisherPhinder::MailParser::ReceivedHeaders::ByParser do
       recipient_additional: '8.14.7/8.14.7',
       authenticated_as: nil,
       protocol: 'ESMTP',
-      id: 'b201si8173212pfb.88.2020.04.25.22.14.05'
+      id: 'b201si8173212pfb.88.2020.04.25.22.14.05',
+      starttls: nil,
     })
   end
 
@@ -100,8 +105,13 @@ RSpec.describe PhisherPhinder::MailParser::ReceivedHeaders::ByParser do
       recipient: 'dodgy.host.zzz',
       recipient_additional: '10.0.0.1',
       authenticated_as: nil,
-      protocol: 'Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384)',
-      id: '15.1.2044.4'
+      protocol: nil,
+      id: '15.1.2044.4',
+      starttls: {
+        version: 'TLS1_2',
+        cipher: 'TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384',
+        bits: nil
+      }
     })
   end
 
@@ -111,7 +121,8 @@ RSpec.describe PhisherPhinder::MailParser::ReceivedHeaders::ByParser do
       recipient_additional: 'DODGY SMTP Server 2.3.2',
       authenticated_as: nil,
       protocol: 'SMTP',
-      id: '702'
+      id: '702',
+      starttls: nil,
     })
   end
 
@@ -121,7 +132,8 @@ RSpec.describe PhisherPhinder::MailParser::ReceivedHeaders::ByParser do
       recipient_additional: nil,
       authenticated_as: nil,
       protocol: 'local-generated (Exim 4.92) (envelope-from <is.this.real.zzz>)',
-      id: '1kIXad-0006OQ-VE'
+      id: '1kIXad-0006OQ-VE',
+      starttls: nil,
     })
   end
 
@@ -131,7 +143,8 @@ RSpec.describe PhisherPhinder::MailParser::ReceivedHeaders::ByParser do
       recipient_additional: nil,
       authenticated_as: nil,
       protocol: 'ESMTP',
-      id: nil
+      id: nil,
+      starttls: nil,
     })
   end
 
@@ -141,7 +154,8 @@ RSpec.describe PhisherPhinder::MailParser::ReceivedHeaders::ByParser do
       recipient_additional: '9.0.032.02',
       authenticated_as: 'foo@test.zzz',
       protocol: nil,
-      id: '5F638B8500006DAA'
+      id: '5F638B8500006DAA',
+      starttls: nil,
     })
   end
 
@@ -151,7 +165,12 @@ RSpec.describe PhisherPhinder::MailParser::ReceivedHeaders::ByParser do
       recipient_additional: '10.10.10.10',
       authenticated_as: nil,
       protocol: 'Frontend Transport',
-      id: '1.2.3.4'
+      id: '1.2.3.4',
+      starttls: {
+        version: 'TLS1_2',
+        cipher: 'TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384',
+        bits: nil
+      }
     })
   end
 
@@ -161,7 +180,8 @@ RSpec.describe PhisherPhinder::MailParser::ReceivedHeaders::ByParser do
       recipient_additional: nil,
       authenticated_as: nil,
       protocol: nil,
-      id: 'SSP82XUF8U4ERPFZGJN4K1M20'
+      id: 'SSP82XUF8U4ERPFZGJN4K1M20',
+      starttls: nil,
     })
   end
 end

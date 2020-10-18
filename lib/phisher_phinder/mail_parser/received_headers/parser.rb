@@ -4,12 +4,11 @@ module PhisherPhinder
   module MailParser
     module ReceivedHeaders
       class Parser
-        def initialize(by_parser:, for_parser:, from_parser:, starttls_parser:, timestamp_parser:, classifier:)
+        def initialize(by_parser:, for_parser:, from_parser:, timestamp_parser:, classifier:)
           @parsers = {
             by: by_parser,
             for: for_parser,
             from: from_parser,
-            starttls: starttls_parser,
             time: timestamp_parser,
           }
           @classifier = classifier
@@ -24,7 +23,13 @@ module PhisherPhinder
           components = extract_value_components(header_value).merge(time: timestamp)
 
           output = @parsers.inject({}) do |memo, (component_name, parser)|
-            memo.merge(parser.parse(components[component_name]))
+            memo.merge(parser.parse(components[component_name])) do |key, old_value, new_value|
+              if key == :starttls && old_value
+                old_value
+              else
+                new_value
+              end
+            end
           end
 
           output.merge(@classifier.classify(output))
@@ -33,49 +38,57 @@ module PhisherPhinder
         private
 
         def extract_value_components(header_value)
-          require 'strscan'
 
-          scanner = StringScanner.new(header_value)
-
-          output = {}
-
-          if scanner.check(/\(from\s+[^)]+\)/)
-            from_part = scanner.scan(/\(from\s+[^)]+\)/)
-          elsif scanner.check(/from\s.+?\(HELO\s[^)]+\)\s\([^\)]*?\)/)
-            from_part = scanner.scan(/from.+?(?=by)/)
-          elsif scanner.check(/from\s[^)(]+\sby/)
-            from_part = scanner.scan(/from.+?(?=by)/)
-          else
-            from_part = scanner.scan(/from\s.+?\([^)]+?\)/)
-          end
-
-          if scanner.check(/.+\S+\s+by/)
-            starttls_part = scanner.scan(/.+\s(?=by)/)
-            by_part = scanner.scan(/\s?by.+?\sid\s[\S]+\s?/)
-            for_part = for_scan(scanner)
-          elsif scanner.check(/\s?by.*with Microsoft SMTP Server.*id.*via Frontend Transport/)
-            by_part = scanner.scan(/\sby.*Frontend Transport/)
-            starttls_part = by_part
-          elsif scanner.check(/\s?by.+?\s(id|ID)\s[\S]+\s?/)
-            by_part = scanner.scan(/\s?by.+?\s(id|ID)\s[\S]+\s?/) unless scanner.eos?
-            for_part = for_scan(scanner)
-            starttls_part = scanner.rest unless scanner.eos?
-          elsif scanner.check(/by.+(?!\sid)/)
-            by_part = scanner.scan(/.+/)
-          end
-
-          {
-            by: by_part,
-            for: for_part,
-            from: from_part,
-            starttls: starttls_part
+          values = {
+            time: [],
+            for: [],
+            by: [],
+            from: []
           }
+
+          cleaned_value = header_value.gsub(/\A\(([^\)]+)\)/, '\1')
+
+          tokenised_value = cleaned_value.split(" ")
+          current_component = nil
+
+          tokenised_value.each do |val|
+            current_component = component_start(val, values) || current_component
+
+            values[current_component] << val if current_component
+          end
+
+          values.inject({}) do |memo, (component, values)|
+            memo.merge(component => (values.any? ? values.join(' ') : nil))
+          end
         end
 
         def for_scan(scanner)
           return nil if scanner.eos?
 
           scanner.check(/for\s<[^>]+>/) ? scanner.scan(/for\s<[^>]+>/) : scanner.scan(/for\s+\S+/)
+        end
+
+        def component_start(token, values)
+          markers = {
+            'from' => :from,
+            'by' => :by,
+            'for' => :for
+          }
+
+          return nil unless component = markers[token]
+
+          blocking_components = {
+            from: [:by, :for],
+            by: [:for],
+            for: []
+          }
+
+          require 'pry'
+          if blocking_components[component].any? { |blocking_comp| values[blocking_comp].any? }
+            nil
+          else
+            component
+          end
         end
       end
     end

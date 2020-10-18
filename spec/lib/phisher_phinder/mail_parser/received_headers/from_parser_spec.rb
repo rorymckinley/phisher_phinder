@@ -30,12 +30,16 @@ RSpec.describe PhisherPhinder::MailParser::ReceivedHeaders::FromParser do
   let(:sample_6) { 'from root ' }
   let(:sample_7) { 'from probably.not.real (HELO foo) ([10.0.0.3])' }
   let(:sample_8) { 'from probably.not.real (HELO foo) () ' }
+  let(:sample_9) do
+    'from probably.not.real (unknown [10.0.0.3]) (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))'
+  end
+  let(:starttls_parser) { PhisherPhinder::MailParser::ReceivedHeaders::StarttlsParser.new }
 
-  subject { described_class.new(enriched_ip_factory) }
+  subject { described_class.new(ip_factory: enriched_ip_factory, starttls_parser: starttls_parser) }
 
   it 'nil input' do
     expect(subject.parse(nil)).to eql({
-      advertised_sender: nil, helo: nil, sender: nil
+      advertised_sender: nil, helo: nil, sender: nil, starttls: nil
     })
   end
 
@@ -46,7 +50,8 @@ RSpec.describe PhisherPhinder::MailParser::ReceivedHeaders::FromParser do
       sender: {
         host: nil,
         ip: enriched_ip_1
-      }
+      },
+      starttls: nil
     })
   end
 
@@ -57,7 +62,8 @@ RSpec.describe PhisherPhinder::MailParser::ReceivedHeaders::FromParser do
       sender: {
         host: 'my.dodgy.host.com',
         ip: enriched_ip_2
-      }
+      },
+      starttls: nil
     })
   end
 
@@ -68,7 +74,8 @@ RSpec.describe PhisherPhinder::MailParser::ReceivedHeaders::FromParser do
       sender: {
         host: nil,
         ip: nil
-      }
+      },
+      starttls: nil
     })
   end
 
@@ -79,7 +86,8 @@ RSpec.describe PhisherPhinder::MailParser::ReceivedHeaders::FromParser do
       sender: {
         host: 'another.dodgy.host.com',
         ip: enriched_ip_3
-      }
+      },
+      starttls: nil
     })
   end
 
@@ -90,7 +98,8 @@ RSpec.describe PhisherPhinder::MailParser::ReceivedHeaders::FromParser do
       sender: {
         host: nil,
         ip: enriched_ip_4
-      }
+      },
+      starttls: nil
     })
   end
 
@@ -101,7 +110,8 @@ RSpec.describe PhisherPhinder::MailParser::ReceivedHeaders::FromParser do
       sender: {
         host: nil,
         ip: nil
-      }
+      },
+      starttls: nil
     })
   end
 
@@ -112,7 +122,8 @@ RSpec.describe PhisherPhinder::MailParser::ReceivedHeaders::FromParser do
       sender: {
         host: nil,
         ip: enriched_ip_1
-      }
+      },
+      starttls: nil
     })
   end
 
@@ -123,6 +134,23 @@ RSpec.describe PhisherPhinder::MailParser::ReceivedHeaders::FromParser do
       sender: {
         host: nil,
         ip: nil
+      },
+      starttls: nil
+    })
+  end
+
+  it 'sample 9' do
+    expect(subject.parse(sample_9)).to eql({
+      advertised_sender: 'probably.not.real',
+      helo: nil,
+      sender: {
+        host: 'unknown',
+        ip: enriched_ip_1
+      },
+      starttls: {
+        version: 'TLSv1.2',
+        cipher: 'ECDHE-RSA-AES256-GCM-SHA384',
+        bits: '256/256'
       }
     })
   end

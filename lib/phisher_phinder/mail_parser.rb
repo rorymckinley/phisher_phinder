@@ -78,11 +78,15 @@ module PhisherPhinder
       end
 
       def parse_received_header(value)
+        starttls_parser = MailParser::ReceivedHeaders::StarttlsParser.new
         parser = MailParser::ReceivedHeaders::Parser.new(
-          by_parser: MailParser::ReceivedHeaders::ByParser.new(@enriched_ip_factory),
-          for_parser: MailParser::ReceivedHeaders::ForParser.new,
-          from_parser: MailParser::ReceivedHeaders::FromParser.new(@enriched_ip_factory),
-          starttls_parser: MailParser::ReceivedHeaders::StarttlsParser.new,
+          by_parser: MailParser::ReceivedHeaders::ByParser.new(
+            ip_factory: @enriched_ip_factory, starttls_parser: starttls_parser
+          ),
+          for_parser: MailParser::ReceivedHeaders::ForParser.new(starttls_parser: starttls_parser),
+          from_parser: MailParser::ReceivedHeaders::FromParser.new(
+            ip_factory: @enriched_ip_factory, starttls_parser: starttls_parser
+          ),
           timestamp_parser: MailParser::ReceivedHeaders::TimestampParser.new,
           classifier: MailParser::ReceivedHeaders::Classifier.new
         )

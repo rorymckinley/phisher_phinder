@@ -4,8 +4,9 @@ module PhisherPhinder
   module MailParser
     module ReceivedHeaders
       class ByParser
-        def initialize(extended_ip_factory)
-          @extended_ip_factory = extended_ip_factory
+        def initialize(ip_factory:, starttls_parser:)
+          @extended_ip_factory = ip_factory
+          @starttls_parser = starttls_parser
         end
 
         def parse(component)
@@ -16,15 +17,20 @@ module PhisherPhinder
               id: nil,
               recipient_additional: nil,
               authenticated_as: nil
-            }
+            }.merge(@starttls_parser.parse(nil))
           end
 
           patterns = [
             %r{by\s(?<recipient>\S+)\s
              \((?<additional>[^)]+)\)\s
-             with\sMicrosoft\sSMTP\sServer\s\([^\)]+\)\s
+             with\sMicrosoft\sSMTP\sServer\s(?<starttls>\([^\)]+\))\s
              id\s(?<id>\S+)\s
              via\s(?<protocol>Frontend\sTransport)
+            }x,
+            %r{by\s(?<recipient>\S+)\s
+             \((?<additional>[^)]+)\)\s
+             with\sMicrosoft\sSMTP\sServer\s(?<starttls>\([^\)]+\))\s
+             id\s(?<id>\S+)
             }x,
             /by\s(?<recipient>\S+)\swith\s(?<protocol>\S+)\sid\s(?<id>\S+)/,
             /by\s(?<recipient>\S+)\s\((?<additional>[^)]+)\)\swith\s(?<protocol>\S+)\sid\s(?<id>\S+)/,
@@ -48,7 +54,13 @@ module PhisherPhinder
             id: matches.names.include?('id') ? matches[:id]: nil,
             recipient_additional: matches.names.include?('additional') ? matches[:additional] : nil,
             authenticated_as: matches.names.include?('authenticated_as') ? matches[:authenticated_as] : nil,
-          }
+          }.merge(
+            if matches.names.include?('starttls')
+              @starttls_parser.parse(matches[:starttls])
+            else
+              @starttls_parser.parse(nil)
+            end
+          )
         end
 
         private
