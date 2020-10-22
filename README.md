@@ -19,10 +19,24 @@ Or install it yourself as:
     $ gem install phisher_phinder
 
 ## Usage
+.env.example contains dependent environment variables for the .env file. You will need to change:
+1. DATABASE_URL
+2. MAXMIND_USER_ID
+3. MAXMIND_LICENCE_KEY
 
 TODO: Write usage instructions here
 
+## Dependencies
+1. [Maxmind GeoIP2 User Account](https://dev.maxmind.com/geoip/geoip2/web-services/) - pay as you go
+2. [Database Cleaner](https://github.com/DatabaseCleaner/database_cleaner#safeguards) - whitelist for database urls
+
 ## Development
+.env.example contains dependent environment variables for the .env.test file. You will need to change: DATABASE_URL=sqlite://test.sqlite3.  
+Prior to running the specs, run the 0001 migration to create the geo_ip_cache table.
+
+```
+# bundle exec rake db:migrate\[0001]
+```
 
 After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
 
