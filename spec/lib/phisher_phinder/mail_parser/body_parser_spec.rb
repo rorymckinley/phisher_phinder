@@ -10,8 +10,11 @@ RSpec.describe PhisherPhinder::MailParser::BodyParser do
   let(:line_end) { "\n" }
   let(:multipart_alternative_content_type) { 'multipart/alternative; boundary=boundary-foo-bar-baz' }
   let(:multipart_alternative_content_type_quoted) { 'multipart/alternative; boundary="boundary-foo-bar-baz' }
+  let(:multipart_alternative_content_type_equals) { 'multipart/alternative; boundary="=boundary-foo-bar-baz' }
   let(:multipart_alternative_raw_body_1) { IO.read(File.join(FIXTURE_PATH, 'bodies', 'multipart_alternative.txt')) }
   let(:multipart_alternative_raw_body_2) { IO.read(File.join(FIXTURE_PATH, 'bodies', 'multipart_alternative_2.txt')) }
+  let(:multipart_alternative_raw_body_3) { IO.read(File.join(FIXTURE_PATH, 'bodies', 'multipart_alternative_3.txt')) }
+  let(:multipart_alternative_raw_body_4) { IO.read(File.join(FIXTURE_PATH, 'bodies', 'multipart_alternative_4.txt')) }
   let(:multipart_alternative_text_body) do
     "Unencoded Text" +
       "This is the first part of the text body.\nIt contains more than one line." +
@@ -97,6 +100,32 @@ RSpec.describe PhisherPhinder::MailParser::BodyParser do
   end
 
   it 'can decode a multipart-alternative body where the boundary is quoted' do
+    expect(
+      subject.parse(
+        body_contents: multipart_alternative_raw_body_1,
+        content_type: multipart_alternative_content_type_quoted,
+        content_transfer_encoding: base64_transfer_encoding,
+      )
+    ).to eql({
+      text: multipart_alternative_text_body,
+      html: multipart_alternative_html_body_1,
+    })
+  end
+
+  it 'can decode a multipart-alternative body where the boundary contains an =' do
+    expect(
+      subject.parse(
+        body_contents: multipart_alternative_raw_body_3,
+        content_type: multipart_alternative_content_type_equals,
+        content_transfer_encoding: base64_transfer_encoding,
+      )
+    ).to eql({
+      text: multipart_alternative_text_body,
+      html: multipart_alternative_html_body_1,
+    })
+  end
+
+  it 'can decode a multipart-alternative body that contains an empty block' do
     expect(
       subject.parse(
         body_contents: multipart_alternative_raw_body_1,
