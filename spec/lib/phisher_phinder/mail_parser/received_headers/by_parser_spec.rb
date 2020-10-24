@@ -46,6 +46,9 @@ RSpec.describe PhisherPhinder::MailParser::ReceivedHeaders::ByParser do
   let(:sample_11) do
     ' by host.test.zzz id SSP82XUF8U4ERPFZGJN4K1M20 '
   end
+  let(:sample_12) do
+    'by host.test.zzz'
+  end
   let(:starttls_parser) { PhisherPhinder::MailParser::ReceivedHeaders::StarttlsParser.new }
 
   subject  { described_class.new(ip_factory: enriched_ip_factory, starttls_parser: starttls_parser) }
@@ -181,6 +184,17 @@ RSpec.describe PhisherPhinder::MailParser::ReceivedHeaders::ByParser do
       authenticated_as: nil,
       protocol: nil,
       id: 'SSP82XUF8U4ERPFZGJN4K1M20',
+      starttls: nil,
+    })
+  end
+
+  it 'sample 12' do
+    expect(subject.parse(sample_12)).to eql({
+      recipient: 'host.test.zzz',
+      recipient_additional: nil,
+      authenticated_as: nil,
+      protocol: nil,
+      id: nil,
       starttls: nil,
     })
   end

@@ -41,7 +41,8 @@ module PhisherPhinder
             /by\s(?<recipient>\S+)\swith\s(?<protocol>.+)\sid\s(?<id>\S+)/,
             /by\s(?<recipient>\S+)\swith\s(?<protocol>.+)/,
             /by\s(?<recipient>\S+)\s\((?<additional>[^)]+)\)\s\(authenticated as (?<authenticated_as>[^\)]+)\)\sid\s(?<id>\S+)/,
-            /by\s(?<recipient>\S+)\sid\s(?<id>\S+)/
+            /by\s(?<recipient>\S+)\sid\s(?<id>\S+)/,
+            /by\s(?<recipient>\S+)/
           ]
 
           matches = patterns.inject(nil) do |memo, pattern|
