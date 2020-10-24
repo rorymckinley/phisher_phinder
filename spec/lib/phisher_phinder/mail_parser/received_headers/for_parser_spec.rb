@@ -8,6 +8,9 @@ RSpec.describe PhisherPhinder::MailParser::ReceivedHeaders::ForParser do
   let(:sample_4) do
     'for <dummy@test.com> (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128)'
   end
+  let(:sample_5) do
+    'for <dummy@test.com> (Google Transport Security)'
+  end
   let(:starttls_parser) { PhisherPhinder::MailParser::ReceivedHeaders::StarttlsParser.new }
 
   subject { described_class.new(starttls_parser: starttls_parser) }
@@ -39,5 +42,9 @@ RSpec.describe PhisherPhinder::MailParser::ReceivedHeaders::ForParser do
         }
       }
     )
+  end
+
+  it 'sample 5' do
+    expect(subject.parse(sample_5)).to eql({recipient_mailbox: 'dummy@test.com', starttls: nil})
   end
 end

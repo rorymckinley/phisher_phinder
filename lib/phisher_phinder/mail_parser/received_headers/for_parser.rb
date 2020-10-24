@@ -12,6 +12,7 @@ module PhisherPhinder
           return {recipient_mailbox: nil}.merge(@starttls_parser.parse(nil)) unless component
 
           patterns = [
+            /\Afor\s(?<recipient_mailbox>\S+)\s\(Google Transport Security\)\z/,
             /\Afor\s(?<recipient_mailbox>\S+)\s(?<starttls>\([^\)]+\))\z/,
             /\Afor\s(?<recipient_mailbox>.+)\z/,
           ]
