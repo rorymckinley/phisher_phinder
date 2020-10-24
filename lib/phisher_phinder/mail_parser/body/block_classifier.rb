@@ -18,15 +18,15 @@ module PhisherPhinder
             content_transfer_encoding: nil
           }
 
-          while processing_block_headers do
-            line = lines.shift.strip
-            if line.empty?
+          while processing_block_headers && lines.any? do
+            line = lines.shift&.strip
+            if line && line.empty?
               processing_block_headers = false
-            elsif line =~ /\AContent-Type:/
+            elsif line && line =~ /\AContent-Type:/
               output.merge!(extract_content_type(line))
 
               output.merge!(extract_character_set(line))
-            elsif line =~ /\AContent-Transfer-Encoding/
+            elsif line && line =~ /\AContent-Transfer-Encoding/
               output.merge!(extract_encoding(line))
             end
           end

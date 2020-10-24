@@ -59,6 +59,9 @@ RSpec.describe PhisherPhinder::MailParser::Body::BlockClassifier do
         "VGhpcyBpcyB0aGUgZmlyc3QgcGFydCBvZiB0aGUgdGV4dCBib2R5LgpJdCBj\n" +
         "b250YWlucyBtb3JlIHRoYW4gb25lIGxpbmUu\n"
     end
+    let(:no_content) do
+      "Content-Type: text/plain; charset=utf-8\n\n\n\n\n"
+    end
     let(:no_headers) do
       "\nFooBarBaz\n"
     end
@@ -76,6 +79,7 @@ RSpec.describe PhisherPhinder::MailParser::Body::BlockClassifier do
       expect(subject.classify_block(text_utf_8_base64)[:content_type]).to eql :text
       expect(subject.classify_block(html_utf_8_base64_1)[:content_type]).to eql :html
       expect(subject.classify_block(no_headers)[:content_type]).to eql :text
+      expect(subject.classify_block(no_content)[:content_type]).to eql :text
     end
 
     it 'correctly classifies the character set' do
@@ -86,6 +90,7 @@ RSpec.describe PhisherPhinder::MailParser::Body::BlockClassifier do
       expect(subject.classify_block(html_windows_1251_base_64_1)[:character_set]).to eql :windows_1251
       expect(subject.classify_block(html_windows_1251_base_64_2)[:character_set]).to eql :windows_1251
       expect(subject.classify_block(no_headers)[:character_set]).to eql :utf_8
+      expect(subject.classify_block(no_content)[:character_set]).to eql :utf_8
     end
 
     it 'correctly classifies the encoding' do
@@ -93,6 +98,7 @@ RSpec.describe PhisherPhinder::MailParser::Body::BlockClassifier do
       expect(subject.classify_block(html_utf_8_7bit)[:content_transfer_encoding]).to eql :seven_bit
       expect(subject.classify_block(html_utf_8_quoted_printable)[:content_transfer_encoding]).to eql :quoted_printable
       expect(subject.classify_block(no_headers)[:content_transfer_encoding]).to be_nil
+      expect(subject.classify_block(no_content)[:content_transfer_encoding]).to be_nil
     end
 
     it 'returns the content for the block' do
@@ -101,6 +107,7 @@ RSpec.describe PhisherPhinder::MailParser::Body::BlockClassifier do
         "b250YWlucyBtb3JlIHRoYW4gb25lIGxpbmUu"
       )
       expect(subject.classify_block(no_headers)[:content]).to eql 'FooBarBaz'
+      expect(subject.classify_block(no_content)[:content]).to eql ""
     end
   end
 
