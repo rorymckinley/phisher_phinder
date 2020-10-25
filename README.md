@@ -35,7 +35,7 @@ TODO: Write usage instructions here
 Prior to running the specs, run the 0001 migration to create the geo_ip_cache table.
 
 ```
-# bundle exec rake db:migrate\[0001]
+# bundle exec rake db:migrate
 ```
 
 After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
