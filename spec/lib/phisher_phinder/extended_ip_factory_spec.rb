@@ -120,5 +120,15 @@ RSpec.describe PhisherPhinder::ExtendedIpFactory do
         )
       end
     end
+
+    describe 'when given an ip that is a reserved address' do
+      it 'returns nil geoip data' do
+        expect(geoip_client).to receive(:lookup).and_raise(MaxMind::GeoIP2::AddressReservedError)
+
+        expect(subject.build('100.100.100.100')).to eq(
+          PhisherPhinder::ExtendedIp.new(ip_address: IPAddr.new('100.100.100.100'), geoip_ip_data: nil)
+        )
+      end
+    end
   end
 end

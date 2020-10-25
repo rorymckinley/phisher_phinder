@@ -45,7 +45,7 @@ module PhisherPhinder
 
     def geoip_data(ip_string)
       @geoip_client.lookup(ip_string)
-    rescue MaxMind::GeoIP2::AddressNotFoundError
+    rescue MaxMind::GeoIP2::AddressNotFoundError, MaxMind::GeoIP2::AddressReservedError
     end
   end
 end
