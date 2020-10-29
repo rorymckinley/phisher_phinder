@@ -13,23 +13,31 @@ RSpec.describe PhisherPhinder::Mail do
     }
   end
 
-  it 'exposes all the email addresses that appear in the Reply-To headers' do
-    mail = described_class.new(
-      **base_headers.merge({
-        headers: {
-          reply_to: [
-            "a@b.com",
-            "c@d.com, <d@e.com >",
-            "d@e.com, e@F.com",
-            "G <g@h.com>, H <h@i.com>"
-          ]
-        }
-      })
-    )
+  describe 'reply_to_addresses' do
+    it 'exposes all the email addresses that appear in the Reply-To headers' do
+      mail = described_class.new(
+        **base_headers.merge({
+          headers: {
+            reply_to: [
+              "a@b.com",
+              "c@d.com, <d@e.com >",
+              "d@e.com, e@F.com",
+              "G <g@h.com>, H <h@i.com>"
+            ]
+          }
+        })
+      )
 
-    expect(mail.reply_to_addresses.sort).to eql([
-      'a@b.com', 'c@d.com', 'd@e.com', 'e@f.com', 'g@h.com', 'h@i.com'
-    ])
+      expect(mail.reply_to_addresses.sort).to eql([
+        'a@b.com', 'c@d.com', 'd@e.com', 'e@f.com', 'g@h.com', 'h@i.com'
+      ])
+    end
+
+    it 'returns an empty collection if there is no `Reply-To` header' do
+      mail = described_class.new(**base_headers)
+
+      expect(mail.reply_to_addresses).to eql([])
+    end
   end
 
   it 'returns a collection of hypertext_links found in the mail body' do

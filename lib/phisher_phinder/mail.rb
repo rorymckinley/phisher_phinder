@@ -16,7 +16,7 @@ module PhisherPhinder
     end
 
     def reply_to_addresses
-      @headers[:reply_to].map do |value_string|
+      (@headers[:reply_to] || []).map do |value_string|
         value_string.split(",")
       end.flatten.map do |email_address_string|
         extract_email_address(email_address_string)
