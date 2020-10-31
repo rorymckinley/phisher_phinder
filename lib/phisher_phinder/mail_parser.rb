@@ -41,12 +41,8 @@ module PhisherPhinder
         headers_array.each_with_index.inject({}) do |memo, (header_string, index)|
           header, value = header_string.split(":", 2)
           sequence = headers_array.length - index - 1
-          memo.merge(convert_header_name(header) => enrich_header_value(value, sequence)) do |_, existing, new|
-            if existing.is_a? Array
-              existing << new
-            else
-              [existing, new]
-            end
+          memo.merge(convert_header_name(header) => [enrich_header_value(value, sequence)]) do |_, existing, new|
+            existing + new
           end
         end
       end
@@ -61,16 +57,8 @@ module PhisherPhinder
 
       def generate_tracing_headers(headers)
         received_header_values = headers.inject([]) do |memo, (header_name, header_value)|
-          if [:received, :x_received].include? header_name
-            if header_value.is_a? Array
-              memo +=  header_value
-            else
-              memo << header_value
-            end
-          end
-
-          memo
-        end.flatten
+          [:received, :x_received].include?(header_name) ? memo + header_value : memo
+        end
 
         {
           received: restore_sequence(received_header_values).map { |v| parse_received_header(v[:data]) }
@@ -100,8 +88,8 @@ module PhisherPhinder
       def parse_body(original_body, headers)
         MailParser::BodyParser.new(@line_end).parse(
           body_contents: original_body,
-          content_type: headers.dig(:content_type, :data),
-          content_transfer_encoding: headers.dig(:content_transfer_encoding, :data),
+          content_type: content_type_data(headers),
+          content_transfer_encoding: content_transfer_encoding_data(headers),
         )
       end
 
@@ -109,6 +97,14 @@ module PhisherPhinder
         if Base64.strict_encode64(Base64.decode64(text)) == text.gsub(/#{@line_end}/, '')
           Base64.decode64(text)
         end
+      end
+
+      def content_type_data(headers)
+        (headers[:content_type] && headers[:content_type].first[:data]) || nil
+      end
+
+      def content_transfer_encoding_data(headers)
+        (headers[:content_transfer_encoding] && headers[:content_transfer_encoding].first[:data]) || nil
       end
     end
   end

@@ -73,8 +73,8 @@ RSpec.describe PhisherPhinder::MailParser::Parser do
 
       it 'extracts headers and includes the header sequence' do
         expect(parsed_simple_mail.headers.keys.sort).to eql [:delivered_to, :received]
-        expect(parsed_simple_mail.headers[:delivered_to]).to eql({data: 'dummy@test.com', sequence: 1})
-        expect(parsed_simple_mail.headers[:received]).to eql({data: received_header_value, sequence: 0})
+        expect(parsed_simple_mail.headers[:delivered_to]).to eql([{data: 'dummy@test.com', sequence: 1}])
+        expect(parsed_simple_mail.headers[:received]).to eql([{data: received_header_value, sequence: 0}])
       end
 
       it 'combines header values when there are multiple entries' do
@@ -214,7 +214,7 @@ RSpec.describe PhisherPhinder::MailParser::Parser do
       end
 
       it 'has a decoded subject if the original subject was UTF-8 Base64 encoded' do
-        subject = parsed_mail_utf8_subject.headers[:subject][:data]
+        subject = parsed_mail_utf8_subject.headers[:subject].first[:data]
         expect(subject).to eql 'foõ ßæÞ'
       end
     end
