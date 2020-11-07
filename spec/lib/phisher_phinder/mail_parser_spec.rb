@@ -13,6 +13,7 @@ RSpec.describe PhisherPhinder::MailParser::Parser do
   let(:enriched_ip_4) { instance_double(PhisherPhinder::ExtendedIp) }
   let(:enriched_ip_5) { instance_double(PhisherPhinder::ExtendedIp) }
   let(:enriched_ip_6) { instance_double(PhisherPhinder::ExtendedIp) }
+  let(:enriched_ip_7) { instance_double(PhisherPhinder::ExtendedIp) }
   let(:enriched_ip_factory) do
     instance_double(PhisherPhinder::ExtendedIpFactory).tap do |factory|
       allow(factory).to receive(:build) do |arg|
@@ -29,6 +30,8 @@ RSpec.describe PhisherPhinder::MailParser::Parser do
           enriched_ip_5
         when '10.0.0.6'
           enriched_ip_6
+        when '10.0.0.1'
+          enriched_ip_7
         when 'mx.google.com'
           nil
         end
@@ -216,6 +219,23 @@ RSpec.describe PhisherPhinder::MailParser::Parser do
       it 'has a decoded subject if the original subject was UTF-8 Base64 encoded' do
         subject = parsed_mail_utf8_subject.headers[:subject].first[:data]
         expect(subject).to eql 'foõ ßæÞ'
+      end
+
+      it 'sets the authentication headers for the email (for now, only authentication-results)' do
+        expect(parsed_complete_mail.authentication_headers).to eql(
+          {
+            authentication_results: [
+              {
+                authserv_id: 'mx.google.com',
+                spf: {
+                  result: :pass,
+                  from: 'scam@my.dodgy.host.com',
+                  ip: enriched_ip_7
+                }
+              }
+            ]
+          }
+        )
       end
     end
   end

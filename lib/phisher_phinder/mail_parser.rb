@@ -19,7 +19,8 @@ module PhisherPhinder
           original_body: original_body,
           headers: headers,
           tracing_headers: generate_tracing_headers(headers),
-          body: parse_body(original_body, headers)
+          body: parse_body(original_body, headers),
+          authentication_headers: generate_authentication_headers(headers)
         )
       end
 
@@ -105,6 +106,15 @@ module PhisherPhinder
 
       def content_transfer_encoding_data(headers)
         (headers[:content_transfer_encoding] && headers[:content_transfer_encoding].first[:data]) || nil
+      end
+
+      def generate_authentication_headers(headers)
+        auth_parser = MailParser::AuthenticationHeaders::Parser.new(
+          authentication_results_parser: MailParser::AuthenticationHeaders::AuthResultsParser.new(
+            ip_factory: @enriched_ip_factory
+          )
+        )
+        auth_parser.parse(headers)
       end
     end
   end

@@ -21,7 +21,8 @@ RSpec.describe PhisherPhinder::ExpandedDataProcessor do
       original_body: '',
       headers: '',
       tracing_headers: [],
-      body: {html: html_body, text: ''}
+      body: {html: html_body, text: ''},
+      authentication_headers: []
     )
   end
 

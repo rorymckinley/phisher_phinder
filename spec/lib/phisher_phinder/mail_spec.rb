@@ -9,6 +9,7 @@ RSpec.describe PhisherPhinder::Mail do
       original_body: '',
       headers: {},
       tracing_headers: [],
+      authentication_headers: [],
       body: ''
     }
   end
@@ -62,5 +63,13 @@ RSpec.describe PhisherPhinder::Mail do
     mail = described_class.new(**base_headers.merge(body: {html: nil, text: 'Foo'}))
 
     expect(mail.hypertext_links).to eql []
+  end
+
+  it 'exposes the provided authentication headers' do
+    mail = described_class.new(**base_headers.merge(authentication_headers: ['foo', 'bar']))
+
+    expect(mail.authentication_headers).to eql ['foo', 'bar']
+
+
   end
 end
