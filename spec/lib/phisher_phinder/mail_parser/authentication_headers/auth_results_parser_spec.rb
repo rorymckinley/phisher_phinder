@@ -62,6 +62,19 @@ RSpec.describe PhisherPhinder::MailParser::AuthenticationHeaders::AuthResultsPar
       'foo@test.com) smtp.mailfrom=foo@test.com'
     ].join
   end
+  let(:sample_6) do
+    [
+      'mail.test.zzz; ',
+      'iprev=pass (sender.foo.bar) smtp.remote-ip=10.0.0.5; ',
+      'spf=neutral smtp.mailfrom=foo@test.com'
+    ].join
+  end
+  let(:sample_7) do
+    [
+      'host-h.net; ',
+      'auth=pass (login) smtp.auth=@test.com'
+    ].join
+  end
 
   subject { described_class.new(ip_factory: enriched_ip_factory) }
 
@@ -119,6 +132,29 @@ RSpec.describe PhisherPhinder::MailParser::AuthenticationHeaders::AuthResultsPar
       identity: '@test.com',
       selector: 'default',
       hash_snippet: 'hFTcwQo7',
+    })
+  end
+
+  it 'sample 6 - iprev' do
+    expect(subject.parse(sample_6)[:iprev]).to eql({
+      result: :pass,
+      remote_host_name: 'sender.foo.bar',
+      remote_ip: enriched_ip_2
+    })
+  end
+
+  it 'sample 6 - spf' do
+    expect(subject.parse(sample_6)[:spf]).to eql({
+      result: :neutral,
+      ip: nil,
+      from: 'foo@test.com'
+    })
+  end
+
+  it 'sample 7 - auth' do
+    expect(subject.parse(sample_7)[:auth]).to eql({
+      result: :pass,
+      domain: '@test.com'
     })
   end
 end
