@@ -46,12 +46,34 @@ RSpec.describe PhisherPhinder::MailParser::AuthenticationHeaders::AuthResultsPar
       'dmarc=pass (p=NONE sp=NONE dis=NONE) header.from=test.com'
     ].join
   end
+  let(:sample_4) do
+    [
+      'mail.test.zzz; ',
+      'dkim=pass header.i=@test.com header.s=default header.b=hFTcwQo7;',
+      'spf=neutral (mail.test.zzz: 10.0.0.3 is neither permitted nor denied by best guess record for domain of ',
+      'foo@test.com) smtp.mailfrom=foo@test.com'
+    ].join
+  end
+  let(:sample_5) do
+    [
+      'mail.test.zzz; ',
+      'dkim=neutral (body hash did not verify) header.i=@test.com header.s=default header.b=hFTcwQo7;',
+      'spf=neutral (mail.test.zzz: 10.0.0.3 is neither permitted nor denied by best guess record for domain of ',
+      'foo@test.com) smtp.mailfrom=foo@test.com'
+    ].join
+  end
 
   subject { described_class.new(ip_factory: enriched_ip_factory) }
 
   it 'sample 1' do
     expect(subject.parse(sample_1)).to eql({
       authserv_id: 'mail.test.zzz',
+      dkim: {
+        result: :temperror,
+        identity: '@test.com',
+        selector: 'default',
+        hash_snippet: 'hFTcwQo7'
+      },
       spf: {
         result: :neutral,
         ip: enriched_ip_1,
@@ -60,7 +82,7 @@ RSpec.describe PhisherPhinder::MailParser::AuthenticationHeaders::AuthResultsPar
     })
   end
 
-  it 'sample 2' do
+  it 'sample 2 - SPF' do
     expect(subject.parse(sample_2)).to eql({
       authserv_id: 'mail.test.zzz',
       spf: {
@@ -79,6 +101,24 @@ RSpec.describe PhisherPhinder::MailParser::AuthenticationHeaders::AuthResultsPar
         ip: enriched_ip_1,
         from: 'foo@test.com'
       },
+    })
+  end
+
+  it 'sample 4 - dkim' do
+    expect(subject.parse(sample_4)[:dkim]).to eql({
+      result: :pass,
+      identity: '@test.com',
+      selector: 'default',
+      hash_snippet: 'hFTcwQo7',
+    })
+  end
+
+  it 'sample 5 - dkim' do
+    expect(subject.parse(sample_5)[:dkim]).to eql({
+      result: :neutral,
+      identity: '@test.com',
+      selector: 'default',
+      hash_snippet: 'hFTcwQo7',
     })
   end
 end

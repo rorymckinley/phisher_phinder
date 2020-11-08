@@ -9,11 +9,11 @@ module PhisherPhinder
         end
 
         def parse(value)
-          authserv_id, results = value.split(';')
+          authserv_id, results = value.split(';', 2)
 
           {
             authserv_id: authserv_id
-          }.merge(spf_data(value))
+          }.merge(spf_data(value)).merge(dkim_data(value))
         end
 
         private
@@ -32,6 +32,30 @@ module PhisherPhinder
               from: matches[:from]
             }
           }
+        end
+
+        def dkim_data(value)
+          matches = value.match(
+            /
+            dkim=(?<result>[\S]+)\s.*?
+            header.i=(?<identity>[\S]+)\s
+            header.s=(?<selector>[\S]+)\s
+            header.b=(?<hash_snippet>.{8})
+            /x
+          )
+
+          if matches
+            {
+              dkim: {
+                result: matches[:result].to_sym,
+                identity: matches[:identity],
+                selector: matches[:selector],
+                hash_snippet: matches[:hash_snippet]
+              }
+            }
+          else
+            {}
+          end
         end
       end
     end
