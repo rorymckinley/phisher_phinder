@@ -25,6 +25,7 @@ require_relative './phisher_phinder/mail_parser/received_headers/for_parser'
 require_relative './phisher_phinder/mail_parser/received_headers/from_parser'
 require_relative './phisher_phinder/mail_parser/received_headers/starttls_parser'
 require_relative './phisher_phinder/mail_parser/received_headers/timestamp_parser'
+require_relative './phisher_phinder/sender_extractor'
 
 module PhisherPhinder
   class Error < StandardError; end
