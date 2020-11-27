@@ -249,6 +249,22 @@ RSpec.describe PhisherPhinder::MailParser::ReceivedHeaders::Parser do
         subject.parse(header_parts.join)
       end
 
+      it 'contains Authenticated-sender' do
+        expect(from_parser).to receive(:parse).with(
+          'from [10.0.0.1] (unknown [10.0.0.1]) (Authenticated sender: foo-bar)'
+        )
+        expect(by_parser).to receive(:parse).with('by recipient.zzz (Postfix) with ESMTPA id 2B2B2611AC')
+        expect(timestamp_parser).to receive(:parse).with(' Mon, 16 Nov 2020 08:44:38 -0600 (CST)')
+
+        header_parts = [
+          'from [10.0.0.1] (unknown [10.0.0.1]) (Authenticated sender: foo-bar) ',
+          'by recipient.zzz (Postfix) ',
+          'with ESMTPA id 2B2B2611AC; Mon, 16 Nov 2020 08:44:38 -0600 (CST)'
+        ]
+
+        subject.parse(header_parts.join)
+      end
+
       it 'mangled and rearranged header' do
         expect(from_parser).to receive(:parse).with('from localhost (127.0.0.1)')
         expect(by_parser).to receive(:parse).with('by recipient.zzz id SSP82XUF8U4ERPFZGJN4K1M20')

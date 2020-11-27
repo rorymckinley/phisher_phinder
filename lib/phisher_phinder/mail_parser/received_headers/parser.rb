@@ -83,7 +83,6 @@ module PhisherPhinder
             for: []
           }
 
-          require 'pry'
           if blocking_components[component].any? { |blocking_comp| values[blocking_comp].any? }
             nil
           else

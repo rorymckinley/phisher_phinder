@@ -17,6 +17,11 @@ module PhisherPhinder
             memo || component.match(pattern)
           end
 
+          unless matches
+            require 'pry'
+            binding.pry
+          end
+
           {
             starttls: {
               version: matches[:version],

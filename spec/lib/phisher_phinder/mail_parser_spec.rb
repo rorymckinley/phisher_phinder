@@ -95,6 +95,7 @@ RSpec.describe PhisherPhinder::MailParser::Parser do
       it 'parses and sets the tracing headers' do
         expect(parsed_complete_mail.tracing_headers[:received]).to eql([
           {
+            advertised_authenticated_sender: nil,
             advertised_sender: nil,
             helo: nil,
             id: 'w17csp2701290oor',
@@ -109,6 +110,7 @@ RSpec.describe PhisherPhinder::MailParser::Parser do
             time: Time.new(2020, 4, 25, 22, 14, 8, '-07:00')
           },
           {
+            advertised_authenticated_sender: nil,
             advertised_sender: nil,
             helo: nil,
             id: 'w6mr17215337plq.173.1587878045528',
@@ -123,6 +125,7 @@ RSpec.describe PhisherPhinder::MailParser::Parser do
             time: Time.new(2020, 4, 25, 22, 14, 7, '-07:00')
           },
           {
+            advertised_authenticated_sender: nil,
             advertised_sender: 'probably.not.real.com',
             helo: nil,
             id: 'u23si16237783eds.526.2020.06.26.06.27.53',
@@ -137,6 +140,7 @@ RSpec.describe PhisherPhinder::MailParser::Parser do
             time: Time.new(2020, 4, 25, 22, 14, 6, '-07:00')
           },
           {
+            advertised_authenticated_sender: nil,
             advertised_sender: 'also.made.up',
             helo: nil,
             id: '3gJek488nka743gKRkR2nY',
@@ -151,6 +155,7 @@ RSpec.describe PhisherPhinder::MailParser::Parser do
             time: Time.new(2020, 4, 25, 22, 14, 5, '-07:00')
           },
           {
+            advertised_authenticated_sender: nil,
             advertised_sender: 'not.real.com',
             helo: nil,
             id: 'b201si8173212pfb.88.2020.04.25.22.14.05',
@@ -165,6 +170,7 @@ RSpec.describe PhisherPhinder::MailParser::Parser do
             time: Time.new(2020, 4, 25, 22, 14, 4, '-07:00')
           },
           {
+            advertised_authenticated_sender: nil,
             advertised_sender: 'still.not.real.com',
             helo: nil,
             id: nil,
@@ -179,6 +185,7 @@ RSpec.describe PhisherPhinder::MailParser::Parser do
             time: nil
           },
           {
+            advertised_authenticated_sender: nil,
             advertised_sender: 'root@localhost',
             helo: nil,
             id: '05QDRrso001911',
