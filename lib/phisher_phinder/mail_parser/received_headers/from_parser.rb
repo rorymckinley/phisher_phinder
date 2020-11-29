@@ -23,6 +23,7 @@ module PhisherPhinder
               \[(?<sender_ip>[^\]]+)\]\)\s
               \(Authenticated\ssender:\s(?<advertised_authenticated_sender>[^\)]+)\)
             }x,
+            /from\s\[(?<sender_ip>[^\]]+)\]\s\(helo=(?<helo>[^\)]+)\)/,
             /from\s(?<advertised_sender>[\S]+)\s\((?<sender_host>\S+?)\.?\s\[(?<sender_ip>[^\]]+)\]\) \((?<starttls>[^\)]+\))/,
             /from\s(?<advertised_sender>[\S]+)\s\((?<sender_host>\S+?)\.?\s\[(?<sender_ip>[^\]]+)\]\) \((?<starttls>[^\)]+\))/,
             /from\s(?<advertised_sender>[\S]+)\s\(HELO\s(?<helo>[^)]+)\)\s\(\)/,
@@ -39,8 +40,9 @@ module PhisherPhinder
             memo || component.match(pattern)
           end
 
+          advertised_sender = extract(matches, :advertised_sender)
           output = {
-            advertised_sender: @extended_ip_factory.build(matches[:advertised_sender]) || matches[:advertised_sender],
+            advertised_sender: @extended_ip_factory.build(advertised_sender) || advertised_sender,
             helo: matches.names.include?('helo') ? matches[:helo] : nil,
             sender: {
               host: matches.names.include?('sender_host') ? matches[:sender_host] : nil,
@@ -59,6 +61,7 @@ module PhisherPhinder
         private
 
         def extract(matches, key)
+          matches.names.include?(key.to_s) ? matches[key] : nil
         end
       end
     end

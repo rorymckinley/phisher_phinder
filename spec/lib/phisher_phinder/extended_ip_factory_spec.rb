@@ -130,5 +130,13 @@ RSpec.describe PhisherPhinder::ExtendedIpFactory do
         )
       end
     end
+
+    describe 'when given a public IPV6 address' do
+      it 'returns a simple ip instance' do
+        expect(subject.build('2a00:d70:0:e::314')).to eq(
+          PhisherPhinder::SimpleIp.new(ip_address: IPAddr.new('2a00:d70:0:e::314'))
+        )
+      end
+    end
   end
 end

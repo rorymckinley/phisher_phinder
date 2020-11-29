@@ -39,7 +39,6 @@ module PhisherPhinder
 
       tracing_senders = []
 
-      # puts "MTH #{mail.tracing_headers[:received].length}"
       mail.tracing_headers[:received].each do |header|
         if tracing_senders.empty?
           if header[:sender] && header[:sender][:ip] == trusted_auth_sender_ip(auth_senders)

@@ -10,7 +10,7 @@ module PhisherPhinder
     def build(ip_string)
       ip = IPAddr.new(ip_string)
 
-      if non_public_ip?(ip)
+      if non_public_ip?(ip) || ip.ipv6?
         SimpleIp.new(ip_address: ip)
       else
         ExtendedIp.new(ip_address: ip, geoip_ip_data: geoip_data(ip_string))

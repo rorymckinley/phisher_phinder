@@ -19,15 +19,25 @@ module PhisherPhinder
         private
 
         def spf_data(value)
-          matches = if value =~ /spf=.+\(.+\)\ssmtp.mailfrom/
-                      value.match(/
-                        spf=(?<result>[\S]+)\s
-                        \(.*\s(?<ip>\d{1,3}.\d{1,3}.\d{1,3}.\d{1,3})\s.*\)\s
-                        smtp.mailfrom=(?<from>[^\s;]+)
-                      /x)
-                    else
-                      value.match(/spf=(?<result>[\S]+)\ssmtp.mailfrom=(?<from>[^\s;]+)/)
-                    end
+          patterns = [
+            %r{
+              spf=(?<result>[\S]+)\s
+              \([^:]+:\s(?<ip>[\S]+)\sis\sneither\spermitted[^\)]+\)\s
+              smtp.mailfrom=(?<from>[^\s;]+)
+            }x,
+            %r{
+              spf=(?<result>[\S]+)\s
+              \(.+\s(?<ip>[\S]+)\sas\spermitted.+\)\s
+              smtp.mailfrom=(?<from>[^\s;]+)
+            }x,
+            %r{
+              spf=(?<result>[\S]+)\ssmtp.mailfrom=(?<from>[^\s;]+)
+            }x,
+          ]
+
+          matches = patterns.inject(nil) do |memo, pattern|
+            memo || value.match(pattern)
+          end
 
           if matches
             {

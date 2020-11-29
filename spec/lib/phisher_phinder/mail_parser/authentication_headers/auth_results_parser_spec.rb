@@ -5,6 +5,7 @@ RSpec.describe PhisherPhinder::MailParser::AuthenticationHeaders::AuthResultsPar
   let(:enriched_ip_2) { instance_double(PhisherPhinder::ExtendedIp) }
   let(:enriched_ip_3) { instance_double(PhisherPhinder::ExtendedIp) }
   let(:enriched_ip_4) { instance_double(PhisherPhinder::ExtendedIp) }
+  let(:simple_ip_1) { instance_double(PhisherPhinder::SimpleIp) }
   let(:enriched_ip_factory) do
     instance_double(PhisherPhinder::ExtendedIpFactory).tap do |factory|
       allow(factory).to receive(:build) do |arg|
@@ -17,6 +18,8 @@ RSpec.describe PhisherPhinder::MailParser::AuthenticationHeaders::AuthResultsPar
           enriched_ip_3
         when '10.0.0.7'
           enriched_ip_4
+        when '2a00:d70:0:e::314'
+          simple_ip_1
         end
       end
     end
@@ -73,6 +76,13 @@ RSpec.describe PhisherPhinder::MailParser::AuthenticationHeaders::AuthResultsPar
     [
       'host-h.net; ',
       'auth=pass (login) smtp.auth=@test.com'
+    ].join
+  end
+  let(:sample_8) do
+    [
+      'mail.test.zzz; ',
+      'spf=neutral (mail.test.zzz: 2a00:d70:0:e::314 is neither permitted nor denied by best guess record for domain ',
+      'of foo@test.com) smtp.mailfrom=foo@test.com'
     ].join
   end
 
@@ -156,5 +166,17 @@ RSpec.describe PhisherPhinder::MailParser::AuthenticationHeaders::AuthResultsPar
       result: :pass,
       domain: '@test.com'
     })
+  end
+
+  it 'sample 8 - spf' do
+    expect(subject.parse(sample_8)).to eql({
+      authserv_id: 'mail.test.zzz',
+      spf: {
+        result: :neutral,
+        ip: simple_ip_1,
+        from: 'foo@test.com'
+      },
+    })
+
   end
 end
