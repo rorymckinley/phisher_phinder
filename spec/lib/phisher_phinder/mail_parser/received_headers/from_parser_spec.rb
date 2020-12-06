@@ -184,6 +184,8 @@ RSpec.describe PhisherPhinder::MailParser::ReceivedHeaders::FromParser do
   end
 
   it 'sample_11' do
+    expect(enriched_ip_factory).to_not receive(:build).with(nil)
+
     expect(subject.parse(sample_11)).to eql({
       advertised_authenticated_sender: nil,
       advertised_sender: nil,
