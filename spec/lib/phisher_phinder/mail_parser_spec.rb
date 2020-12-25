@@ -234,11 +234,15 @@ RSpec.describe PhisherPhinder::MailParser::Parser do
             authentication_results: [
               {
                 authserv_id: 'mx.google.com',
-                spf: {
+                dkim: [],
+                spf: [{
                   result: :pass,
                   from: 'scam@my.dodgy.host.com',
                   ip: enriched_ip_7
-                }
+                }],
+                auth: [],
+                iprev: [],
+                dmarc: []
               }
             ]
           }

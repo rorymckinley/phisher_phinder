@@ -91,92 +91,106 @@ RSpec.describe PhisherPhinder::MailParser::AuthenticationHeaders::AuthResultsPar
   it 'sample 1' do
     expect(subject.parse(sample_1)).to eql({
       authserv_id: 'mail.test.zzz',
-      dkim: {
+      dkim: [{
         result: :temperror,
         identity: '@test.com',
         selector: 'default',
         hash_snippet: 'hFTcwQo7'
-      },
-      spf: {
+      }],
+      spf: [{
         result: :neutral,
         ip: enriched_ip_1,
         from: 'foo@test.com'
-      },
+      }],
+      iprev: [],
+      auth: [],
+      dmarc: [],
     })
   end
 
   it 'sample 2 - SPF' do
     expect(subject.parse(sample_2)).to eql({
       authserv_id: 'mail.test.zzz',
-      spf: {
+      dkim: [],
+      spf: [{
         result: :pass,
         ip: enriched_ip_1,
         from: 'foo@test.com'
-      },
+      }],
+      iprev: [],
+      auth: [],
+      dmarc: [{}],
     })
   end
 
   it 'sample 3' do
     expect(subject.parse(sample_3)).to eql({
       authserv_id: 'mail.test.zzz',
-      spf: {
+      dkim: [],
+      spf: [{
         result: :fail,
         ip: enriched_ip_1,
         from: 'foo@test.com'
-      },
+      }],
+      iprev: [],
+      auth: [],
+      dmarc: [{}],
     })
   end
 
   it 'sample 4 - dkim' do
-    expect(subject.parse(sample_4)[:dkim]).to eql({
+    expect(subject.parse(sample_4)[:dkim]).to eql([{
       result: :pass,
       identity: '@test.com',
       selector: 'default',
       hash_snippet: 'hFTcwQo7',
-    })
+    }])
   end
 
   it 'sample 5 - dkim' do
-    expect(subject.parse(sample_5)[:dkim]).to eql({
+    expect(subject.parse(sample_5)[:dkim]).to eql([{
       result: :neutral,
       identity: '@test.com',
       selector: 'default',
       hash_snippet: 'hFTcwQo7',
-    })
+    }])
   end
 
   it 'sample 6 - iprev' do
-    expect(subject.parse(sample_6)[:iprev]).to eql({
+    expect(subject.parse(sample_6)[:iprev]).to eql([{
       result: :pass,
       remote_host_name: 'sender.foo.bar',
       remote_ip: enriched_ip_2
-    })
+    }])
   end
 
   it 'sample 6 - spf' do
-    expect(subject.parse(sample_6)[:spf]).to eql({
+    expect(subject.parse(sample_6)[:spf]).to eql([{
       result: :neutral,
       ip: nil,
       from: 'foo@test.com'
-    })
+    }])
   end
 
   it 'sample 7 - auth' do
-    expect(subject.parse(sample_7)[:auth]).to eql({
+    expect(subject.parse(sample_7)[:auth]).to eql([{
       result: :pass,
       domain: '@test.com'
-    })
+    }])
   end
 
   it 'sample 8 - spf' do
     expect(subject.parse(sample_8)).to eql({
       authserv_id: 'mail.test.zzz',
-      spf: {
+      dkim: [],
+      spf: [{
         result: :neutral,
         ip: simple_ip_1,
         from: 'foo@test.com'
-      },
+      }],
+      iprev: [],
+      auth: [],
+      dmarc: [],
     })
-
   end
 end

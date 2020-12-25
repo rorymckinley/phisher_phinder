@@ -9,14 +9,39 @@ module PhisherPhinder
         end
 
         def parse(value)
-          authserv_id, results = value.split(';', 2)
+          output_template = {authserv_id: nil, auth: [], dkim: [], dmarc: [], iprev: [], spf: []}
 
-          {
-            authserv_id: authserv_id
-          }.merge(spf_data(value)).merge(dkim_data(value)).merge(iprev_data(value)).merge(auth_data(value))
+          components(value).inject(output_template) do |output, component|
+            component_type, parsed_component = parse_component(component)
+            if output[component_type].respond_to?(:<<)
+              output.merge(component_type => (output[component_type] << parsed_component))
+            else
+              output.merge(component_type => parsed_component)
+            end
+          end
         end
 
         private
+
+        def components(value)
+          value.split(';').map { |component| component.strip }
+        end
+
+        def parse_component(component)
+          if component =~ /\Aspf=/
+            [:spf, spf_data(component)]
+          elsif component =~ /\Adkim=/
+            [:dkim, dkim_data(component)]
+          elsif component =~ /\Aiprev=/
+            [:iprev, iprev_data(component)]
+          elsif component =~ /\Aauth=/
+            [:auth, auth_data(component)]
+          elsif component =~ /\Admarc=/
+            [:dmarc, {}]
+          else
+            [:authserv_id, component]
+          end
+        end
 
         def spf_data(value)
           patterns = [
@@ -41,11 +66,9 @@ module PhisherPhinder
 
           if matches
             {
-              spf: {
-                result: matches[:result].to_sym,
-                ip: matches.names.include?('ip') ? @ip_factory.build(matches[:ip]) : nil,
-                from: matches[:from]
-              }
+              result: matches[:result].to_sym,
+              ip: matches.names.include?('ip') ? @ip_factory.build(matches[:ip]) : nil,
+              from: matches[:from]
             }
           else
             {}
@@ -64,12 +87,10 @@ module PhisherPhinder
 
           if matches
             {
-              dkim: {
-                result: matches[:result].to_sym,
-                identity: matches[:identity],
-                selector: matches[:selector],
-                hash_snippet: matches[:hash_snippet]
-              }
+              result: matches[:result].to_sym,
+              identity: matches[:identity],
+              selector: matches[:selector],
+              hash_snippet: matches[:hash_snippet]
             }
           else
             {}
@@ -87,11 +108,9 @@ module PhisherPhinder
 
           if matches
             {
-              iprev: {
-                result: matches[:result].to_sym,
-                remote_host_name: matches[:remote_host_name],
-                remote_ip: @ip_factory.build(matches[:remote_ip]),
-              }
+              result: matches[:result].to_sym,
+              remote_host_name: matches[:remote_host_name],
+              remote_ip: @ip_factory.build(matches[:remote_ip]),
             }
           else
             {}
@@ -103,10 +122,8 @@ module PhisherPhinder
 
           if matches
             {
-              auth: {
-                result: matches[:result].to_sym,
-                domain: matches[:domain],
-              }
+              result: matches[:result].to_sym,
+              domain: matches[:domain],
             }
           else
             {}

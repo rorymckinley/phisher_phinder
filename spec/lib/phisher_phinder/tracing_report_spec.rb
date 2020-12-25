@@ -27,11 +27,11 @@ RSpec.describe PhisherPhinder::TracingReport do
       let(:authentication_results) do
         [
           {
-            spf: {
+            spf: [{
               result: :pass,
               ip: ip_3,
               from: 'foo@test.com'
-            }
+            }]
           }
         ]
       end
@@ -50,11 +50,11 @@ RSpec.describe PhisherPhinder::TracingReport do
       let(:authentication_results) do
         [
           {
-            spf: {
+            spf: [{
               result: :neutral,
               ip: ip_3,
               from: 'foo@test.com'
-            }
+            }]
           }
         ]
       end
@@ -73,11 +73,11 @@ RSpec.describe PhisherPhinder::TracingReport do
       let(:authentication_results) do
         [
           {
-            spf: {
+            spf: [{
               result: :fail,
               ip: ip_3,
               from: 'foo@test.com'
-            }
+            }]
           }
         ]
       end
@@ -96,18 +96,18 @@ RSpec.describe PhisherPhinder::TracingReport do
       let(:authentication_results) do
         [
           {
-            spf: {
+            spf: [{
               result: :fail,
               ip: ip_3,
               from: 'foo@test.com'
-            }
+            }]
           },
           {
-            spf: {
+            spf: [{
               result: :pass,
               ip: ip_4,
               from: 'bar@test.com'
-            }
+            }]
           }
         ]
       end
@@ -127,11 +127,11 @@ RSpec.describe PhisherPhinder::TracingReport do
     let(:authentication_results) do
       [
         {
-          spf: {
+          spf: [{
             result: :pass,
             ip: ip_3,
             from: 'foo@test.com'
-          }
+          }]
         }
       ]
     end

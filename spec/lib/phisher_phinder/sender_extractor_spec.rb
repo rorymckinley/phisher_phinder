@@ -28,9 +28,9 @@ RSpec.describe PhisherPhinder::SenderExtractor do
         {
           authentication_headers: {
             authentication_results: [
-              {authserv_id: 'foo.host', spf: {result: :pass, ip: ip_1, from: 'foo@test.com'}},
-              {authserv_id: 'bar.host', spf: {result: :neutral, ip: ip_2, from: 'bar@test.com'}},
-              {authserv_id: 'baz.host', spf: {result: :fail, ip: ip_3, from: 'baz@test.com'}},
+              {authserv_id: 'foo.host', spf: [{result: :pass, ip: ip_1, from: 'foo@test.com'}]},
+              {authserv_id: 'bar.host', spf: [{result: :neutral, ip: ip_2, from: 'bar@test.com'}]},
+              {authserv_id: 'baz.host', spf: [{result: :fail, ip: ip_3, from: 'baz@test.com'}]},
             ]
           }
         }
@@ -67,10 +67,10 @@ RSpec.describe PhisherPhinder::SenderExtractor do
         {
           authentication_headers: {
             authentication_results: [
-              {authserv_id: 'foo.host', spf: {result: :pass, ip: ip_1, from: 'foo@test.com'}},
-              {authserv_id: 'bar.host', spf: {result: :neutral, ip: ip_2, from: 'bar@test.com'}},
-              {authserv_id: 'foo.host', spf: {result: :fail, ip: ip_3, from: 'baz@test.com'}},
-              {authserv_id: 'fizz.host', spf: {result: :fail, ip: ip_4, from: 'fizz@test.com'}},
+              {authserv_id: 'foo.host', spf: [{result: :pass, ip: ip_1, from: 'foo@test.com'}]},
+              {authserv_id: 'bar.host', spf: [{result: :neutral, ip: ip_2, from: 'bar@test.com'}]},
+              {authserv_id: 'foo.host', spf: [{result: :fail, ip: ip_3, from: 'baz@test.com'}]},
+              {authserv_id: 'fizz.host', spf: [{result: :fail, ip: ip_4, from: 'fizz@test.com'}]},
             ]
           }
         }
@@ -99,10 +99,10 @@ RSpec.describe PhisherPhinder::SenderExtractor do
         {
           authentication_headers: {
             authentication_results: [
-              {authserv_id: 'foo.host', spf: {result: :pass, ip: ip_1, from: 'foo@test.com'}},
-              {authserv_id: 'bar.host', spf: {result: :neutral, ip: ip_2, from: 'bar@test.com'}},
-              {authserv_id: 'baz.host', spf: {result: :fail, ip: ip_3, from: 'foo@test.com'}},
-              {authserv_id: 'fizz.host', spf: {result: :fail, ip: ip_4, from: 'fizz@test.com'}},
+              {authserv_id: 'foo.host', spf: [{result: :pass, ip: ip_1, from: 'foo@test.com'}]},
+              {authserv_id: 'bar.host', spf: [{result: :neutral, ip: ip_2, from: 'bar@test.com'}]},
+              {authserv_id: 'baz.host', spf: [{result: :fail, ip: ip_3, from: 'foo@test.com'}]},
+              {authserv_id: 'fizz.host', spf: [{result: :fail, ip: ip_4, from: 'fizz@test.com'}]},
             ]
           }
         }
@@ -134,9 +134,9 @@ RSpec.describe PhisherPhinder::SenderExtractor do
         {
           authentication_headers: {
             authentication_results: [
-              {authserv_id: 'foo.host', spf: {result: :pass, ip: ip_1, from: 'foo@test.com'}},
-              {authserv_id: 'bar.host', spf: {result: :neutral, ip: ip_2, from: 'bar@test.com'}},
-              {authserv_id: 'baz.host', spf: {result: :fail, ip: ip_3, from: 'baz@test.com'}},
+              {authserv_id: 'foo.host', spf: [{result: :pass, ip: ip_1, from: 'foo@test.com'}]},
+              {authserv_id: 'bar.host', spf: [{result: :neutral, ip: ip_2, from: 'bar@test.com'}]},
+              {authserv_id: 'baz.host', spf: [{result: :fail, ip: ip_3, from: 'baz@test.com'}]},
             ]
           },
           tracing_headers: {
@@ -184,9 +184,9 @@ RSpec.describe PhisherPhinder::SenderExtractor do
         {
           authentication_headers: {
             authentication_results: [
-              {authserv_id: 'foo.host', spf: {result: :pass, ip: ip_1, from: 'foo@test.com'}},
-              {authserv_id: 'bar.host', spf: {result: :neutral, ip: ip_2, from: 'bar@test.com'}},
-              {authserv_id: 'baz.host', spf: {result: :fail, ip: ip_3, from: 'baz@test.com'}},
+              {authserv_id: 'foo.host', spf: [{result: :pass, ip: ip_1, from: 'foo@test.com'}]},
+              {authserv_id: 'bar.host', spf: [{result: :neutral, ip: ip_2, from: 'bar@test.com'}]},
+              {authserv_id: 'baz.host', spf: [{result: :fail, ip: ip_3, from: 'baz@test.com'}]},
             ]
           },
           tracing_headers: {

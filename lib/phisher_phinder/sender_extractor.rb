@@ -16,10 +16,14 @@ module PhisherPhinder
         trusted_auth_header = authentication_results.first
         untrusted_auth_headers = authentication_results[1..-1]
 
-        auth_senders[:hosts] << {entry_type: :ip, host: trusted_auth_header[:spf][:ip], spf: {present: true, trusted: true}}
+        auth_senders[:hosts] << {
+          entry_type: :ip,
+          host: trusted_auth_header[:spf].first[:ip],
+          spf: {present: true, trusted: true}
+        }
         auth_senders[:email_addresses] << {
-          email_address: trusted_auth_header[:spf][:from],
-          spf: {present: true, trusted: true, result: trusted_auth_header[:spf][:result]},
+          email_address: trusted_auth_header[:spf].first[:from],
+          spf: {present: true, trusted: true, result: trusted_auth_header[:spf].first[:result]},
         }
 
         processed_authservs << trusted_auth_header[:authserv_id]
@@ -27,11 +31,11 @@ module PhisherPhinder
         untrusted_auth_headers.each do |header|
           next if processed_authservs.include? header[:authserv_id]
 
-          auth_senders[:hosts] << {entry_type: :ip, host: header[:spf][:ip], spf: {present: true, trusted: false}}
-          unless auth_senders[:email_addresses].find { |entry| entry[:email_address] == header[:spf][:from] }
+          auth_senders[:hosts] << {entry_type: :ip, host: header[:spf].first[:ip], spf: {present: true, trusted: false}}
+          unless auth_senders[:email_addresses].find { |entry| entry[:email_address] == header[:spf].first[:from] }
             auth_senders[:email_addresses] << {
-              email_address: header[:spf][:from],
-              spf: {present: true, trusted: false, result: header[:spf][:result]},
+              email_address: header[:spf].first[:from],
+              spf: {present: true, trusted: false, result: header[:spf].first[:result]},
             }
           end
         end
