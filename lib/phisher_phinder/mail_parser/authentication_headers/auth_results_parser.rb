@@ -76,21 +76,30 @@ module PhisherPhinder
         end
 
         def dkim_data(value)
-          matches = value.match(
-            /
-            dkim=(?<result>[\S]+)\s.*?
-            header.i=(?<identity>[\S]+)\s
-            header.s=(?<selector>[\S]+)\s
-            header.b=(?<hash_snippet>.{8})
-            /x
-          )
+          patterns = [
+            %r{
+              dkim=(?<result>[\S]+)\s.*?
+              header.i=(?<identity>[\S]+)\s
+              header.s=(?<selector>[\S]+)\s
+              header.b=(?<hash_snippet>.{8})
+            }x,
+            %r{
+              dkim=(?<result>[\S]+)\s.*?
+              header.i=(?<identity>[\S]+)\s
+              header.s=(?<selector>[\S]+)
+            }x,
+          ]
+
+          matches = patterns.inject(nil) do |memo, pattern|
+            memo || value.match(pattern)
+          end
 
           if matches
             {
               result: matches[:result].to_sym,
               identity: matches[:identity],
               selector: matches[:selector],
-              hash_snippet: matches[:hash_snippet]
+              hash_snippet: extract(matches, :hash_snippet)
             }
           else
             {}
@@ -128,6 +137,12 @@ module PhisherPhinder
           else
             {}
           end
+        end
+
+        private
+
+        def extract(matches, key)
+          matches.names.include?(key.to_s) ? matches[key] : nil
         end
       end
     end

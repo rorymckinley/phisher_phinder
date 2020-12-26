@@ -85,6 +85,15 @@ RSpec.describe PhisherPhinder::MailParser::AuthenticationHeaders::AuthResultsPar
       'of foo@test.com) smtp.mailfrom=foo@test.com'
     ].join
   end
+  let(:sample_9) do
+    [
+      'mail.test.zzz; ',
+      'dkim=pass header.i=@test1.zzz header.s=pic; ',
+      'dkim=pass header.i=@test2.zzz header.s=krs; ',
+      'spf=pass smtp.mailfrom=@test2.zzz; ',
+      'dmarc=success(p=NONE) header.from=dodgy.domain.com;'
+    ].join
+  end
 
   subject { described_class.new(ip_factory: enriched_ip_factory) }
 
@@ -191,6 +200,34 @@ RSpec.describe PhisherPhinder::MailParser::AuthenticationHeaders::AuthResultsPar
       iprev: [],
       auth: [],
       dmarc: [],
+    })
+  end
+
+  it 'sample 9' do
+    expect(subject.parse(sample_9)).to eql({
+      authserv_id: 'mail.test.zzz',
+      dkim: [
+        {
+          result: :pass,
+          identity: '@test1.zzz',
+          selector: 'pic',
+          hash_snippet: nil
+        },
+        {
+          result: :pass,
+          identity: '@test2.zzz',
+          selector: 'krs',
+          hash_snippet: nil
+        }
+      ],
+      spf: [{
+        result: :pass,
+        ip: nil,
+        from: '@test2.zzz'
+      }],
+      iprev: [],
+      auth: [],
+      dmarc: [{}],
     })
   end
 end
