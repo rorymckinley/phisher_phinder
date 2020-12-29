@@ -80,6 +80,7 @@ RSpec.describe PhisherPhinder::MailParser::AuthenticationHeaders::ReceivedSpfPar
       helo: nil,
       receiver: nil,
       envelope_from: nil,
+      identity: nil,
     })
   end
 
@@ -93,6 +94,7 @@ RSpec.describe PhisherPhinder::MailParser::AuthenticationHeaders::ReceivedSpfPar
       helo: nil,
       receiver: nil,
       envelope_from: nil,
+      identity: nil,
     })
   end
 
@@ -106,6 +108,7 @@ RSpec.describe PhisherPhinder::MailParser::AuthenticationHeaders::ReceivedSpfPar
       helo: nil,
       receiver: nil,
       envelope_from: nil,
+      identity: nil,
     })
   end
 
@@ -119,6 +122,7 @@ RSpec.describe PhisherPhinder::MailParser::AuthenticationHeaders::ReceivedSpfPar
       helo: nil,
       receiver: nil,
       envelope_from: nil,
+      identity: nil,
     })
   end
 
@@ -132,6 +136,7 @@ RSpec.describe PhisherPhinder::MailParser::AuthenticationHeaders::ReceivedSpfPar
       helo: 'helo.zzz',
       receiver: 'receiver.zzz',
       envelope_from: nil,
+      identity: nil,
     })
   end
 
@@ -145,6 +150,7 @@ RSpec.describe PhisherPhinder::MailParser::AuthenticationHeaders::ReceivedSpfPar
       helo: enriched_ip_4,
       receiver: 'receiver.zzz',
       envelope_from: nil,
+      identity: nil,
     })
   end
 
@@ -158,6 +164,7 @@ RSpec.describe PhisherPhinder::MailParser::AuthenticationHeaders::ReceivedSpfPar
       helo: 'helo.zzz',
       receiver: nil,
       envelope_from: 'foo2@test.zzz',
+      identity: nil,
     })
   end
 
@@ -171,6 +178,7 @@ RSpec.describe PhisherPhinder::MailParser::AuthenticationHeaders::ReceivedSpfPar
       helo: nil,
       receiver: nil,
       envelope_from: nil,
+      identity: nil,
     })
   end
 
@@ -184,6 +192,7 @@ RSpec.describe PhisherPhinder::MailParser::AuthenticationHeaders::ReceivedSpfPar
       helo: 'helo.zzz',
       receiver: '<UNKNOWN>',
       envelope_from: 'foo2@test.zzz',
+      identity: 'mailfrom',
     })
   end
 
@@ -197,6 +206,7 @@ RSpec.describe PhisherPhinder::MailParser::AuthenticationHeaders::ReceivedSpfPar
       helo: nil,
       receiver: nil,
       envelope_from: nil,
+      identity: nil,
     })
   end
 end
