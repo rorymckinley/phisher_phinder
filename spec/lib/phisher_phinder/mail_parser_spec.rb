@@ -244,6 +244,18 @@ RSpec.describe PhisherPhinder::MailParser::Parser do
                 iprev: [],
                 dmarc: []
               }
+            ],
+            received_spf: [
+              {
+                authserv_id: 'google.com',
+                envelope_from: nil,
+                helo: nil,
+                receiver: nil,
+                result: :pass,
+                mailfrom: 'scam@my.dodgy.host.com',
+                ip: enriched_ip_7,
+                client_ip: enriched_ip_7,
+              }
             ]
           }
         )

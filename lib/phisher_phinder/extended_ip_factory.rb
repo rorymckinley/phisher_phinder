@@ -8,6 +8,8 @@ module PhisherPhinder
     end
 
     def build(ip_string)
+      return nil unless ip_string
+
       ip = IPAddr.new(ip_string)
 
       if non_public_ip?(ip) || ip.ipv6?

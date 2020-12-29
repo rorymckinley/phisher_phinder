@@ -112,7 +112,10 @@ module PhisherPhinder
         auth_parser = MailParser::AuthenticationHeaders::Parser.new(
           authentication_results_parser: MailParser::AuthenticationHeaders::AuthResultsParser.new(
             ip_factory: @enriched_ip_factory
-          )
+          ),
+          received_spf_parser: MailParser::AuthenticationHeaders::ReceivedSpfParser.new(
+            ip_factory: @enriched_ip_factory
+          ),
         )
         auth_parser.parse(headers)
       end

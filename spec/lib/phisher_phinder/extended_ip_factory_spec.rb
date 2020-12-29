@@ -14,6 +14,10 @@ RSpec.describe PhisherPhinder::ExtendedIpFactory do
       expect(subject.build('mx.google.com')).to be_nil
     end
 
+    it 'returns nil if passed nil as an argument' do
+      expect(subject.build(nil)).to be_nil
+    end
+
     describe 'when given a public ip address' do
       it 'fetches ip information from the geoip client' do
         expect(geoip_client).to receive(:lookup).with(ip_address_string)
