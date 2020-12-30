@@ -16,28 +16,28 @@ RSpec.describe PhisherPhinder::TracingReport do
       },
       body: '',
       authentication_headers: {
-        authentication_results: authentication_results
+        received_spf: received_spf
       }
     )
   end
   let(:received_headers) { [] }
 
+  subject { described_class.new(mail) }
+
   describe 'authentication' do
     describe 'successful SPF check' do
-      let(:authentication_results) do
+      let(:received_spf) do
         [
           {
-            spf: [{
-              result: :pass,
-              ip: ip_3,
-              from: 'foo@test.com'
-            }]
+            result: :pass,
+            ip: ip_3,
+            mailfrom: 'foo@test.com'
           }
         ]
       end
 
       it 'indicates that the SPF check was successful' do
-        report = subject.report(mail)
+        report = subject.report
 
         expect(report[:authentication]).to eql({
           mechanisms: [:spf],
@@ -47,20 +47,18 @@ RSpec.describe PhisherPhinder::TracingReport do
     end
 
     describe 'neutral SPF check' do
-      let(:authentication_results) do
+      let(:received_spf) do
         [
           {
-            spf: [{
-              result: :neutral,
-              ip: ip_3,
-              from: 'foo@test.com'
-            }]
+            result: :neutral,
+            ip: ip_3,
+            mailfrom: 'foo@test.com'
           }
         ]
       end
 
       it 'indicates that the SPF check was unsuccessful' do
-        report = subject.report(mail)
+        report = subject.report
 
         expect(report[:authentication]).to eql({
           mechanisms: [:spf],
@@ -70,20 +68,18 @@ RSpec.describe PhisherPhinder::TracingReport do
     end
 
     describe 'fail SPF check' do
-      let(:authentication_results) do
+      let(:received_spf) do
         [
           {
-            spf: [{
-              result: :fail,
-              ip: ip_3,
-              from: 'foo@test.com'
-            }]
+            result: :fail,
+            ip: ip_3,
+            mailfrom: 'foo@test.com'
           }
         ]
       end
 
       it 'indicates that the SPF check was unsuccessful' do
-        report = subject.report(mail)
+        report = subject.report
 
         expect(report[:authentication]).to eql({
           mechanisms: [:spf],
@@ -92,28 +88,24 @@ RSpec.describe PhisherPhinder::TracingReport do
       end
     end
 
-    describe 'multiple `authentication_result` entries' do
-      let(:authentication_results) do
+    describe 'multiple `received_spf` entries' do
+      let(:received_spf) do
         [
           {
-            spf: [{
-              result: :fail,
-              ip: ip_3,
-              from: 'foo@test.com'
-            }]
+            result: :fail,
+            ip: ip_3,
+            mailfrom: 'foo@test.com'
           },
           {
-            spf: [{
-              result: :pass,
-              ip: ip_4,
-              from: 'bar@test.com'
-            }]
+            result: :pass,
+            ip: ip_4,
+            mailfrom: 'bar@test.com'
           }
         ]
       end
 
       it 'uses the first entry in the result set' do
-        report = subject.report(mail)
+        report = subject.report
 
         expect(report[:authentication]).to eql({
           mechanisms: [:spf],
@@ -124,17 +116,6 @@ RSpec.describe PhisherPhinder::TracingReport do
   end
 
   describe 'tracing' do
-    let(:authentication_results) do
-      [
-        {
-          spf: [{
-            result: :pass,
-            ip: ip_3,
-            from: 'foo@test.com'
-          }]
-        }
-      ]
-    end
     let(:received_headers) do
       [
         {
@@ -151,9 +132,18 @@ RSpec.describe PhisherPhinder::TracingReport do
         },
       ]
     end
+    let(:received_spf) do
+      [
+        {
+          result: :poass,
+          ip: ip_3,
+          mailfrom: 'foo@test.com'
+        },
+      ]
+    end
 
     it 'starts the list of tracing headers from the first tracing header that matches auth results' do
-      report = subject.report(mail)
+      report = subject.report
 
       expect(report[:tracing]).to eql([
         {sender: {host: 'c', ip: ip_3}},

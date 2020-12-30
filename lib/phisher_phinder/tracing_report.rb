@@ -2,26 +2,33 @@
 
 module PhisherPhinder
   class TracingReport
-    def report(mail)
-      trusted_auth_header = mail.authentication_headers[:authentication_results].first
+    def initialize(mail)
+      @mail = mail
+    end
+
+    def report
 
       {
         authentication: {
           mechanisms: [:spf],
           spf: {
-            success: trusted_auth_header[:spf].first[:result] == :pass,
-            ip: trusted_auth_header[:spf].first[:ip],
-            from_address: trusted_auth_header[:spf].first[:from]
+            success: latest_spf_entry[:result] == :pass,
+            ip: latest_spf_entry[:ip],
+            from_address: latest_spf_entry[:mailfrom]
           }
         },
-        tracing: extract_tracing_headers(mail.tracing_headers, trusted_auth_header)
+        tracing: extract_tracing_headers(@mail.tracing_headers, latest_spf_entry)
       }
     end
 
     private
 
-    def extract_tracing_headers(received_headers, trusted_auth_header)
-      start = received_headers[:received].find_index { |h| h[:sender][:ip] == trusted_auth_header[:spf].first[:ip] }
+    def latest_spf_entry
+      @mail.authentication_headers[:received_spf].first
+    end
+
+    def extract_tracing_headers(received_headers, latest_spf_entry)
+      start = received_headers[:received].find_index { |h| h[:sender][:ip] == latest_spf_entry[:ip] }
       received_headers[:received][start..-1]
     end
   end
