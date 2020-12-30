@@ -7,7 +7,6 @@ module PhisherPhinder
     end
 
     def report
-
       {
         authentication: {
           mechanisms: [:spf],

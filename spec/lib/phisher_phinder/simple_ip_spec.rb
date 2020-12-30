@@ -8,4 +8,8 @@ RSpec.describe PhisherPhinder::SimpleIp do
       PhisherPhinder::ExtendedIp.new(ip_address: '127.0.0.1', geoip_ip_data: nil)
     )
   end
+
+  it 'returns the ip address when to_s is called' do
+    expect(described_class.new(ip_address: '127.0.0.1').to_s).to eql '127.0.0.1'
+  end
 end

@@ -12,5 +12,9 @@ module PhisherPhinder
     def ==(other)
       ip_address == other.ip_address && geoip_ip_data == other.geoip_ip_data
     end
+
+    def to_s
+      @ip_address.to_s
+    end
   end
 end
