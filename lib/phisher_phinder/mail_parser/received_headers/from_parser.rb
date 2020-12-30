@@ -12,7 +12,13 @@ module PhisherPhinder
         def parse(component)
           unless component
             return {
-              advertised_authenticated_sender: nil, advertised_sender: nil, helo: nil, sender: nil
+              advertised_authenticated_sender: nil,
+              advertised_sender: nil,
+              helo: nil,
+              sender: {
+                host: nil,
+                ip: nil
+              },
             }.merge(@starttls_parser.parse(nil))
           end
 

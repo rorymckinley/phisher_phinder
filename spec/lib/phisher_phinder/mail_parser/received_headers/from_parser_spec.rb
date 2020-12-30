@@ -49,7 +49,14 @@ RSpec.describe PhisherPhinder::MailParser::ReceivedHeaders::FromParser do
 
   it 'nil input' do
     expect(subject.parse(nil)).to eql({
-      advertised_authenticated_sender: nil, advertised_sender: nil, helo: nil, sender: nil, starttls: nil
+      advertised_authenticated_sender: nil,
+      advertised_sender: nil,
+      helo: nil,
+      sender: {
+        host: nil,
+        ip: nil
+      },
+      starttls: nil
     })
   end
 
