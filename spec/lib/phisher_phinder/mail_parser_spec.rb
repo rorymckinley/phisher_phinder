@@ -255,6 +255,7 @@ RSpec.describe PhisherPhinder::MailParser::Parser do
                 mailfrom: 'scam@my.dodgy.host.com',
                 ip: enriched_ip_7,
                 client_ip: enriched_ip_7,
+                identity: nil,
               }
             ]
           }

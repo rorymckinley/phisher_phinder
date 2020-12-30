@@ -31,7 +31,8 @@ RSpec.describe PhisherPhinder::TracingReport do
           {
             result: :pass,
             ip: ip_3,
-            mailfrom: 'foo@test.com'
+            mailfrom: 'foo@test.com',
+            client_ip: ip_1,
           }
         ]
       end
@@ -41,7 +42,7 @@ RSpec.describe PhisherPhinder::TracingReport do
 
         expect(report[:authentication]).to eql({
           mechanisms: [:spf],
-          spf: {success: true, from_address: 'foo@test.com', ip: ip_3},
+          spf: {success: true, from_address: 'foo@test.com', ip: ip_3, client_ip: ip_1},
         })
       end
     end
@@ -52,7 +53,8 @@ RSpec.describe PhisherPhinder::TracingReport do
           {
             result: :neutral,
             ip: ip_3,
-            mailfrom: 'foo@test.com'
+            mailfrom: 'foo@test.com',
+            client_ip: ip_1,
           }
         ]
       end
@@ -62,7 +64,7 @@ RSpec.describe PhisherPhinder::TracingReport do
 
         expect(report[:authentication]).to eql({
           mechanisms: [:spf],
-          spf: {success: false, from_address: 'foo@test.com', ip: ip_3},
+          spf: {success: false, from_address: 'foo@test.com', ip: ip_3, client_ip: ip_1},
         })
       end
     end
@@ -73,7 +75,8 @@ RSpec.describe PhisherPhinder::TracingReport do
           {
             result: :fail,
             ip: ip_3,
-            mailfrom: 'foo@test.com'
+            mailfrom: 'foo@test.com',
+            client_ip: ip_1,
           }
         ]
       end
@@ -83,7 +86,7 @@ RSpec.describe PhisherPhinder::TracingReport do
 
         expect(report[:authentication]).to eql({
           mechanisms: [:spf],
-          spf: {success: false, from_address: 'foo@test.com', ip: ip_3},
+          spf: {success: false, from_address: 'foo@test.com', ip: ip_3, client_ip: ip_1},
         })
       end
     end
@@ -94,12 +97,14 @@ RSpec.describe PhisherPhinder::TracingReport do
           {
             result: :fail,
             ip: ip_3,
-            mailfrom: 'foo@test.com'
+            mailfrom: 'foo@test.com',
+            client_ip: ip_1,
           },
           {
             result: :pass,
             ip: ip_4,
-            mailfrom: 'bar@test.com'
+            mailfrom: 'bar@test.com',
+            client_ip: ip_2,
           }
         ]
       end
@@ -109,7 +114,7 @@ RSpec.describe PhisherPhinder::TracingReport do
 
         expect(report[:authentication]).to eql({
           mechanisms: [:spf],
-          spf: {success: false, from_address: 'foo@test.com', ip: ip_3},
+          spf: {success: false, from_address: 'foo@test.com', ip: ip_3, client_ip: ip_1},
         })
       end
     end
@@ -132,23 +137,50 @@ RSpec.describe PhisherPhinder::TracingReport do
         },
       ]
     end
-    let(:received_spf) do
-      [
-        {
-          result: :poass,
-          ip: ip_3,
-          mailfrom: 'foo@test.com'
-        },
-      ]
+
+    describe 'SPF record has a IP entry' do
+      let(:received_spf) do
+        [
+          {
+            result: :pass,
+            ip: ip_3,
+            mailfrom: 'foo@test.com',
+            client_ip: ip_1
+          },
+        ]
+      end
+
+      it 'starts the list of tracing headers from the first tracing header that matches the IP' do
+        report = subject.report
+
+        expect(report[:tracing]).to eql([
+          {sender: {host: 'c', ip: ip_3}},
+          {sender: {host: 'd', ip: ip_4}},
+        ])
+      end
     end
 
-    it 'starts the list of tracing headers from the first tracing header that matches auth results' do
-      report = subject.report
+    describe 'SPF record has no ip entry but does have a client-ip entry' do
+      let(:received_spf) do
+        [
+          {
+            result: :pass,
+            ip: nil,
+            mailfrom: 'foo@test.com',
+            client_ip: ip_2
+          },
+        ]
+      end
 
-      expect(report[:tracing]).to eql([
-        {sender: {host: 'c', ip: ip_3}},
-        {sender: {host: 'd', ip: ip_4}},
-      ])
+      it 'starts the list of tracing headers from the first tracing header that matches auth results' do
+        report = subject.report
+
+        expect(report[:tracing]).to eql([
+          {sender: {host: 'b', ip: ip_2}},
+          {sender: {host: 'c', ip: ip_3}},
+          {sender: {host: 'd', ip: ip_4}},
+        ])
+      end
     end
   end
 end
