@@ -42,6 +42,7 @@ RSpec.describe PhisherPhinder::MailParser::ReceivedHeaders::FromParser do
   let(:sample_12) do
     'from 10.0.0.5 (EHLO foo.bar.baz)'
   end
+  let(:sample_13) { 'from [10.0.0.3] (foo.bar.baz [10.0.0.5])' }
   let(:starttls_parser) { PhisherPhinder::MailParser::ReceivedHeaders::StarttlsParser.new }
 
   subject { described_class.new(ip_factory: enriched_ip_factory, starttls_parser: starttls_parser) }
@@ -208,6 +209,19 @@ RSpec.describe PhisherPhinder::MailParser::ReceivedHeaders::FromParser do
       helo: 'foo.bar.baz',
       sender: {
         host: nil,
+        ip: enriched_ip_2
+      },
+      starttls: nil
+    })
+  end
+
+  it 'sample_13' do
+    expect(subject.parse(sample_13)).to eql({
+      advertised_authenticated_sender: nil,
+      advertised_sender: enriched_ip_1,
+      helo: nil,
+      sender: {
+        host: 'foo.bar.baz',
         ip: enriched_ip_2
       },
       starttls: nil

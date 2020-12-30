@@ -24,6 +24,11 @@ module PhisherPhinder
               \(Authenticated\ssender:\s(?<advertised_authenticated_sender>[^\)]+)\)
             }x,
             /from\s\[(?<sender_ip>[^\]]+)\]\s\(helo=(?<helo>[^\)]+)\)/,
+            %r{
+              from\s\[(?<advertised_sender>[\S]+)\]\s
+              \((?<sender_host>\S+?)\.?\s
+              \[(?<sender_ip>[^\]]+)\]\)
+            }x,
             /from\s(?<sender_ip>[^\]]+)\s\(EHLO\s(?<helo>[^\)]+)\)/,
             /from\s(?<advertised_sender>[\S]+)\s\((?<sender_host>\S+?)\.?\s\[(?<sender_ip>[^\]]+)\]\) \((?<starttls>[^\)]+\))/,
             /from\s(?<advertised_sender>[\S]+)\s\((?<sender_host>\S+?)\.?\s\[(?<sender_ip>[^\]]+)\]\) \((?<starttls>[^\)]+\))/,
