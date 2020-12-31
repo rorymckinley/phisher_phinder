@@ -6,9 +6,16 @@ PATH
 GEM
   remote: https://rubygems.org/
   specs:
+    activesupport (6.1.0)
+      concurrent-ruby (~> 1.0, >= 1.0.2)
+      i18n (>= 1.6, < 2)
+      minitest (>= 5.1)
+      tzinfo (~> 2.0)
+      zeitwerk (~> 2.3)
     addressable (2.7.0)
       public_suffix (>= 2.0.2, < 5.0)
     coderay (1.1.2)
+    concurrent-ruby (1.1.7)
     connection_pool (2.2.3)
     crack (0.4.3)
       safe_yaml (~> 1.0.0)
@@ -35,6 +42,8 @@ GEM
     http-form_data (2.3.0)
     http-parser (1.2.1)
       ffi-compiler (>= 1.0, < 2.0)
+    i18n (1.8.5)
+      concurrent-ruby (~> 1.0)
     maxmind-db (1.1.1)
     maxmind-geoip2 (0.4.0)
       connection_pool (~> 2.2)
@@ -42,6 +51,7 @@ GEM
       maxmind-db (~> 1.1)
     method_source (1.0.0)
     mini_portile2 (2.4.0)
+    minitest (5.14.2)
     nokogiri (1.10.10)
       mini_portile2 (~> 2.4.0)
     pry (0.13.1)
@@ -65,6 +75,8 @@ GEM
     safe_yaml (1.0.5)
     sequel (5.33.0)
     sqlite3 (1.4.2)
+    tzinfo (2.0.4)
+      concurrent-ruby (~> 1.0)
     unf (0.1.4)
       unf_ext
     unf_ext (0.0.7.7)
@@ -72,6 +84,11 @@ GEM
       addressable (>= 2.3.6)
       crack (>= 0.3.2)
       hashdiff (>= 0.4.0, < 2.0.0)
+    whois (5.0.1)
+    whois-parser (1.2.0)
+      activesupport (>= 4)
+      whois (>= 4.0.7)
+    zeitwerk (2.4.2)
 
 PLATFORMS
   ruby
@@ -88,6 +105,8 @@ DEPENDENCIES
   sequel (~> 5.33)
   sqlite3 (~> 1.4.2)
   webmock (~> 3.8.3)
+  whois (~> 5.0.1)
+  whois-parser (~> 1.2.0)
 
 BUNDLED WITH
    2.1.4
