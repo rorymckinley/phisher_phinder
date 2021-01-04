@@ -1,0 +1,61 @@
+#!/usr/bin/env ruby
+
+require 'optparse'
+require 'phisher_phinder'
+
+options = {
+  line_ending: "\r\n",
+  geoip_lookup: false,
+  geoip_settings: {
+    account_id: nil,
+    license_key: nil
+  }
+}
+
+OptionParser.new do |opts|
+  opts.banner = 'Usage: phisher_phinder [options] /path/to/email/contents'
+  line_endings = {
+    'windows' => "\r\n",
+    'dos' => "\r\n",
+    'unix' => "\n",
+  }
+
+  def geoip_credentials?(opts)
+    opts[:geoip_settings][:account_id] && opts[:geoip_settings][:license_key]
+  end
+
+  opts.on('-a ACCOUNT_ID', '--account_id ACCOUNT_ID', 'GeoIP account id') do |account_id|
+    options[:geoip_settings][:account_id] = account_id
+  end
+
+  opts.on('-k LICENSE_KEY', '--license_key LICENSE_KEY', 'GeoIP license key') do |license_key|
+    options[:geoip_settings][:license_key] = license_key
+  end
+
+  opts.on(
+    '-g',
+    '--geoip',
+    'Enable lookup of GeoIP data for IP addresses (requires `DATABASE_URL` env variable to be defined)'
+  ) do |geoip|
+    raise 'Please provide the GeoIP account id and license key' unless geoip_credentials?(options)
+    raise 'Please set the DATABASE_URL ENV variable' unless ENV['DATABASE_URL']
+    options[:geoip_lookup] = geoip
+  end
+
+  opts.on('-l TYPE', '--line-ending TYPE', line_endings, 'Select line ending type for file') do |ending|
+    options[:line_ending] = ending
+  end
+
+  opts.on('-h', '--help', 'Prints help text') do
+    puts opts
+    exit
+  end
+end.parse!
+
+file_contents = IO.read(ARGV.last)
+
+command = PhisherPhinder::Command.new
+
+PhisherPhinder::Display.new.display_report(
+  command.report(file_contents, **options)
+)

@@ -17,6 +17,7 @@ module PhisherPhinder
             client_ip: latest_spf_entry[:client_ip],
           }
         },
+        origin: extract_origin_headers(@mail.headers),
         tracing: extract_tracing_headers(@mail.tracing_headers, latest_spf_entry)
       }
     end
@@ -34,6 +35,13 @@ module PhisherPhinder
     def extract_tracing_headers(received_headers, latest_spf_entry)
       start = received_headers[:received].find_index { |h| h[:sender][:ip] == ip_address(latest_spf_entry) }
       received_headers[:received][start..-1]
+    end
+
+    def extract_origin_headers(headers)
+      [:from, :return_path, :message_id].inject({}) do |output, header_type|
+        entries = headers[header_type] || []
+        output.merge(header_type => entries.map { |h| h[:data] })
+      end
     end
   end
 end

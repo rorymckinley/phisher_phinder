@@ -5,8 +5,8 @@ require_relative('mail_parser/header_value_parser')
 module PhisherPhinder
   module MailParser
     class Parser
-      def initialize(enriched_ip_factory, line_ending_type)
-        @line_end = line_ending_type == 'dos' ? "\r\n" : "\n"
+      def initialize(enriched_ip_factory, line_ending)
+        @line_ending = line_ending
         @enriched_ip_factory = enriched_ip_factory
       end
 
@@ -27,15 +27,15 @@ module PhisherPhinder
       private
 
       def separate(contents)
-        contents.split("#{@line_end}#{@line_end}", 2)
+        contents.split("#{@line_ending}#{@line_ending}", 2)
       end
 
       def extract_headers(headers)
-        parse_headers(unfold_headers(headers).split(@line_end))
+        parse_headers(unfold_headers(headers).split(@line_ending))
       end
 
       def unfold_headers(headers)
-        headers.gsub(/#{@line_end}[\s\t]+/, ' ')
+        headers.gsub(/#{@line_ending}[\s\t]+/, ' ')
       end
 
       def parse_headers(headers_array)
@@ -87,7 +87,7 @@ module PhisherPhinder
       end
 
       def parse_body(original_body, headers)
-        MailParser::BodyParser.new(@line_end).parse(
+        MailParser::BodyParser.new(@line_ending).parse(
           body_contents: original_body,
           content_type: content_type_data(headers),
           content_transfer_encoding: content_transfer_encoding_data(headers),
@@ -95,7 +95,7 @@ module PhisherPhinder
       end
 
       def valid_base64_decoded(text)
-        if Base64.strict_encode64(Base64.decode64(text)) == text.gsub(/#{@line_end}/, '')
+        if Base64.strict_encode64(Base64.decode64(text)) == text.gsub(/#{@line_ending}/, '')
           Base64.decode64(text)
         end
       end

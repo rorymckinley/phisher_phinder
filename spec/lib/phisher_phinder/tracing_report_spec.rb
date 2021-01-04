@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 RSpec.describe PhisherPhinder::TracingReport do
+  let(:from_entries) { [{data: 'from_1@test.zzz'}, {data: 'from_2@test.zzz'}] }
   let(:ip_1) { PhisherPhinder::ExtendedIp.new(ip_address: '10.0.0.1', geoip_ip_data: '1') }
   let(:ip_2) { PhisherPhinder::ExtendedIp.new(ip_address: '10.0.0.2', geoip_ip_data: '1') }
   let(:ip_3) { PhisherPhinder::ExtendedIp.new(ip_address: '10.0.0.3', geoip_ip_data: '1') }
@@ -10,7 +11,11 @@ RSpec.describe PhisherPhinder::TracingReport do
       original_email: '',
       original_headers: '',
       original_body: '',
-      headers: [],
+      headers: {
+        from: from_entries,
+        return_path: return_path_entries,
+        message_id: message_id_entries
+      },
       tracing_headers: {
         received: received_headers
       },
@@ -20,7 +25,19 @@ RSpec.describe PhisherPhinder::TracingReport do
       }
     )
   end
+  let(:message_id_entries) { [{data: 'message_id_1'}, {data: 'message_id_2'}] }
   let(:received_headers) { [] }
+  let(:received_spf) do
+    [
+      {
+        result: :pass,
+        ip: ip_3,
+        mailfrom: 'foo@test.com',
+        client_ip: ip_1,
+      }
+    ]
+  end
+  let(:return_path_entries) { [{data: 'rp_1@test.zzz'}, {data: 'rp_2@test.zzz'}] }
 
   subject { described_class.new(mail) }
 
@@ -181,6 +198,44 @@ RSpec.describe PhisherPhinder::TracingReport do
           {sender: {host: 'd', ip: ip_4}},
         ])
       end
+    end
+  end
+
+  describe 'origin' do
+    let(:mail_without_origin_headers) do
+      PhisherPhinder::Mail.new(
+        original_email: '',
+        original_headers: '',
+        original_body: '',
+        headers: { },
+        tracing_headers: {
+          received: received_headers
+        },
+        body: '',
+        authentication_headers: {
+          received_spf: received_spf
+        }
+      )
+    end
+
+    it 'returns the origin information for the mail' do
+      report = subject.report
+
+      expect(report[:origin]).to eql({
+        from: ['from_1@test.zzz', 'from_2@test.zzz'],
+        return_path: ['rp_1@test.zzz', 'rp_2@test.zzz'],
+        message_id: ['message_id_1', 'message_id_2']
+      })
+    end
+
+    it 'returns empty collections if there are no origin headers available' do
+      report = described_class.new(mail_without_origin_headers).report
+
+      expect(report[:origin]).to eql({
+        from: [],
+        return_path: [],
+        message_id: []
+      })
     end
   end
 end

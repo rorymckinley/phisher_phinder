@@ -45,19 +45,19 @@ RSpec.describe PhisherPhinder::MailParser::Parser do
     "        Sat, 25 Apr 2020 22:14:05 -0700 (PDT)"
   end
   let(:parsed_mail_with_base64_body) do
-    described_class.new(enriched_ip_factory, ENV.fetch('LINE_ENDING_TYPE')).parse(base64_mail_contents)
+    described_class.new(enriched_ip_factory, "\n").parse(base64_mail_contents)
   end
   let(:parsed_mail_with_multipart_base64_body) do
-    described_class.new(enriched_ip_factory, ENV.fetch('LINE_ENDING_TYPE')).parse(multipart_base64_mail_contents)
+    described_class.new(enriched_ip_factory, "\n").parse(multipart_base64_mail_contents)
   end
   let(:parsed_complete_mail) do
-    described_class.new(enriched_ip_factory, ENV.fetch('LINE_ENDING_TYPE')).parse(complete_mail_contents)
+    described_class.new(enriched_ip_factory, "\n").parse(complete_mail_contents)
   end
   let(:parsed_simple_mail) do
-    described_class.new(enriched_ip_factory, ENV.fetch('LINE_ENDING_TYPE')).parse(simple_mail_contents)
+    described_class.new(enriched_ip_factory, "\n").parse(simple_mail_contents)
   end
   let(:parsed_mail_utf8_subject) do
-    described_class.new(enriched_ip_factory, ENV.fetch('LINE_ENDING_TYPE')).parse(mail_with_utf8_subject_contents)
+    described_class.new(enriched_ip_factory, "\n").parse(mail_with_utf8_subject_contents)
   end
   let(:received_header_value) do
     "by 2002:a4a:d031:0:0:0:0:0 with SMTP id w17csp2701290oor; Sat, 25 Apr 2020 22:14:05 -0700 (PDT)"
@@ -105,7 +105,7 @@ RSpec.describe PhisherPhinder::MailParser::Parser do
             recipient_additional: nil,
             authenticated_as: nil,
             recipient_mailbox: 'anotherdummy@test.com',
-            sender: nil,
+            sender: {host: nil, ip: nil},
             starttls: nil,
             time: Time.new(2020, 4, 25, 22, 14, 8, '-07:00')
           },
@@ -120,7 +120,7 @@ RSpec.describe PhisherPhinder::MailParser::Parser do
             recipient_additional: nil,
             authenticated_as: nil,
             recipient_mailbox: nil,
-            sender: nil,
+            sender: {host: nil, ip: nil},
             starttls: nil,
             time: Time.new(2020, 4, 25, 22, 14, 7, '-07:00')
           },

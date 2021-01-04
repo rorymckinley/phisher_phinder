@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    phisher_phinder (0.1.0)
+    phisher_phinder (0.2.0)
 
 GEM
   remote: https://rubygems.org/
@@ -75,11 +75,15 @@ GEM
     safe_yaml (1.0.5)
     sequel (5.33.0)
     sqlite3 (1.4.2)
+    terminal-table (2.0.0)
+      unicode-display_width (~> 1.1, >= 1.1.1)
+    timecop (0.9.2)
     tzinfo (2.0.4)
       concurrent-ruby (~> 1.0)
     unf (0.1.4)
       unf_ext
     unf_ext (0.0.7.7)
+    unicode-display_width (1.7.0)
     webmock (3.8.3)
       addressable (>= 2.3.6)
       crack (>= 0.3.2)
@@ -104,6 +108,8 @@ DEPENDENCIES
   rspec (~> 3.0)
   sequel (~> 5.33)
   sqlite3 (~> 1.4.2)
+  terminal-table (~> 2.0.0)
+  timecop (~> 0.9.2)
   webmock (~> 3.8.3)
   whois (~> 5.0.1)
   whois-parser (~> 1.2.0)

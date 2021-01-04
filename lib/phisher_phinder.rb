@@ -2,11 +2,13 @@ require "phisher_phinder/version"
 
 require 'maxmind/geoip2'
 
-require 'sequel'
-Sequel::Model.plugin :timestamps, update_on_create: true
+require_relative './phisher_phinder/command'
+require_relative './phisher_phinder/display'
 
 require_relative './phisher_phinder/body_hyperlink'
 require_relative './phisher_phinder/cached_geoip_client'
+require_relative './phisher_phinder/null_lookup_client'
+require_relative './phisher_phinder/null_response'
 require_relative './phisher_phinder/geoip_ip_data'
 require_relative './phisher_phinder/expanded_data_processor'
 require_relative './phisher_phinder/extended_ip'
