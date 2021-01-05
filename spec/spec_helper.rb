@@ -2,9 +2,6 @@ require "bundler/setup"
 require 'dotenv'
 Dotenv.load('.env.test')
 
-require 'sequel'
-DB = Sequel.connect(ENV.fetch('DATABASE_URL'))
-
 require "phisher_phinder"
 require 'database_cleaner/sequel'
 require 'webmock/rspec'
