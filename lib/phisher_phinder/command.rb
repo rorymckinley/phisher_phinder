@@ -4,7 +4,10 @@ module PhisherPhinder
   class Command
     def report(contents, line_ending:, geoip_lookup:, geoip_settings: {})
       lookup_client = if geoip_lookup
-                        PhisherPhinder::CachedGeoipClient.new(MaxMind::GeoIP2::Client.new(**geoip_settings), Time.now - 86400)
+                        PhisherPhinder::CachedGeoipClient.new(
+                          MaxMind::GeoIP2::Client.new(**geoip_settings),
+                          Time.now - 86400
+                        )
                       else
                         PhisherPhinder::NullLookupClient.new
                       end
