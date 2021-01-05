@@ -27,6 +27,20 @@ Gem::Specification.new do |spec|
   spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
   spec.require_paths = ["lib"]
 
+  spec.add_dependency "dotenv", "~> 2.7.5"
+  spec.add_dependency "maxmind-geoip2", "~> 0.4.0"
+  spec.add_dependency "nokogiri", "~> 1.11.0"
+  spec.add_dependency "sequel", "~> 5.33"
+  spec.add_dependency "sqlite3", "~> 1.4.2"
+  spec.add_dependency "terminal-table", "~> 2.0.0"
+  spec.add_dependency "whois", "~> 5.0.1"
+  spec.add_dependency "whois-parser", "~> 1.2.0"
+
+  spec.add_development_dependency "bundler-audit", "~> 0.7.0.1"
+  spec.add_development_dependency "rake", "~> 12.0"
+  spec.add_development_dependency "rspec", "~> 3.0"
+  spec.add_development_dependency "timecop", "~> 0.9.2"
+  spec.add_development_dependency 'database_cleaner-sequel', '1.8.0'
+  spec.add_development_dependency 'webmock', '~> 3.8.3'
   spec.add_development_dependency "pry"
-  spec.add_development_dependency "rspec", "3.9.0"
 end
