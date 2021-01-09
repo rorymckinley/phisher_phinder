@@ -13,7 +13,14 @@ module PhisherPhinder
                       end
       ip_factory = PhisherPhinder::ExtendedIpFactory.new(geoip_client: lookup_client)
       mail_parser = PhisherPhinder::MailParser::Parser.new(ip_factory, line_ending)
-      tracing_report = PhisherPhinder::TracingReport.new(mail_parser.parse(contents))
+      whois_client = Whois::Client.new
+      tracing_report = PhisherPhinder::TracingReport.new(
+        mail_parser.parse(contents),
+        PhisherPhinder::ContactFinder.new(
+          whois_client: whois_client,
+          extractor: PhisherPhinder::WhoisEmailExtractor.new
+        )
+      )
       tracing_report.report
     end
   end

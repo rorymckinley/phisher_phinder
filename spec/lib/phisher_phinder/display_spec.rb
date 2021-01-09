@@ -30,12 +30,20 @@ RSpec.describe PhisherPhinder::Display do
           {
             sender: {ip: ip_1, host: 'foo.bar'},
             advertised_sender: ip_2,
-            recipient: ip_3
+            recipient: ip_3,
+            sender_contact_details: {
+              host: {email: ['host_1@test.zzz', 'host_2@test.zzz']},
+              ip: {email: ['ip_1@test.zzz', 'ip_2@test.zzz']}
+            }
           },
           {
             sender: {ip: ip_4, host: 'baz.bar'},
             advertised_sender: ip_5,
-            recipient: ip_6
+            recipient: ip_6,
+            sender_contact_details: {
+              host: {email: ['host_3@test.zzz', 'host_4@test.zzz']},
+              ip: {email: ['ip_3@test.zzz', 'ip_4@test.zzz']}
+            }
           }
         ]
       }
@@ -57,6 +65,33 @@ RSpec.describe PhisherPhinder::Display do
               sender: {ip: ip_1, host: 'foo.bar'},
               helo: ip_2,
               recipient: ip_3,
+              sender_contact_details: {
+                host: {email: ['host_1@test.zzz', 'host_2@test.zzz']},
+                ip: {email: ['ip_1@test.zzz', 'ip_2@test.zzz']}
+              }
+            },
+          ]
+        }
+      end
+      let(:input_with_dirty_contact_details) do
+        {
+          authentication: {
+            spf: {}
+          },
+          origin: {
+            from: [],
+            message_id: [],
+            return_path: []
+          },
+          tracing: [
+            {
+              sender: {ip: ip_1, host: 'foo.bar'},
+              helo: ip_2,
+              recipient: ip_3,
+              sender_contact_details: {
+                host: {email: ['<host_1@test.zzz>', '<host_2@test.zzz>,']},
+                ip: {email: ['<ip_1@test.zzz>', '<ip_2@test.zzz>,']}
+              }
             },
           ]
         }
@@ -65,19 +100,33 @@ RSpec.describe PhisherPhinder::Display do
       it 'outputs a representation of the tracing data' do
         expect do
           subject.display_report(input)
-        end.to output(/Sender IP.+Sender Host.+Advertised Sender.+Recipient/).to_stdout
+        end.to output(/Sender IP.+IP Contacts.+Sender Host.+Host Contact.+Advertised Sender.+Recipient/).to_stdout
         expect do
           subject.display_report(input)
-        end.to output(/10\.0\.0\.1.+foo\.bar.+10.0.0.2.+10\.0\.0\.3/).to_stdout
+        end.to output(
+          /10\.0\.0\.1.+ip_1@test.zzz, ip_2@test.zzz.+foo\.bar.+host_1@test.zzz, host_2@test.zzz.+10.0.0.2.+10\.0\.0\.3/
+        ).to_stdout
         expect do
           subject.display_report(input)
-        end.to output(/10\.0\.0\.4.+baz\.bar.+10.0.0.5.+10\.0\.0\.6/).to_stdout
+        end.to output(
+          /10\.0\.0\.4.+ip_3@test.zzz, ip_4@test.zzz.+baz\.bar.+host_3@test.zzz, host_4@test.zzz.+10.0.0.5.+10\.0\.0\.6/
+        ).to_stdout
       end
 
       it 'uses helo data if no advertised sender is provided' do
         expect do
           subject.display_report(input_with_helo)
-        end.to output(/10\.0\.0\.1.+foo\.bar.+10.0.0.2.+10\.0\.0\.3/).to_stdout
+        end.to output(
+          /10\.0\.0\.1.+ip_1@test.zzz, ip_2@test.zzz.+foo\.bar.+host_1@test.zzz, host_2@test.zzz.+10.0.0.2.+10\.0\.0\.3/
+        ).to_stdout
+      end
+
+      it 'cleans up any formatting characters' do
+        expect do
+          subject.display_report(input_with_dirty_contact_details)
+        end.to output(
+          /10\.0\.0\.1.+ip_1@test.zzz, ip_2@test.zzz.+foo\.bar.+host_1@test.zzz, host_2@test.zzz.+10.0.0.2.+10\.0\.0\.3/
+        ).to_stdout
       end
     end
 

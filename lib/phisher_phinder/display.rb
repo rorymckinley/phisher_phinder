@@ -32,14 +32,16 @@ module PhisherPhinder
       data = input_data[:tracing].map do |entry|
         [
           entry[:sender][:ip],
+          display_email_addresses(entry[:sender_contact_details][:ip][:email]),
           entry[:sender][:host],
+          display_email_addresses(entry[:sender_contact_details][:host][:email]),
           entry[:advertised_sender] || entry[:helo],
           entry[:recipient]
         ]
       end
 
       trace_table = Terminal::Table.new(
-        headings: ['Sender IP', 'Sender Host', 'Advertised Sender', 'Recipient'],
+        headings: ['Sender IP', 'IP Contacts', 'Sender Host', 'Host Contacts', 'Advertised Sender', 'Recipient'],
         title: 'Trace',
         rows: data
       )
@@ -59,6 +61,10 @@ module PhisherPhinder
       types.inject([]) do |output, (description, type)|
         output << [description, input_data[:origin][type].join(', ')]
       end
+    end
+
+    def display_email_addresses(email_addresses)
+      email_addresses.map { |address| address.gsub(/[,<>]/, '') }.join(', ')
     end
   end
 end

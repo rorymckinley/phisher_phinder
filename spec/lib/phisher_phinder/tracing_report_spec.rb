@@ -1,6 +1,26 @@
 # frozen_string_literal: true
 
 RSpec.describe PhisherPhinder::TracingReport do
+  let(:contact_finder) do
+    instance_double(PhisherPhinder::ContactFinder).tap do |dbl|
+      allow(dbl).to receive(:contacts_for) do |arg|
+        case arg
+          when ip_2
+            ['ip_2@test.zzz']
+          when ip_3
+            ['ip_3@test.zzz']
+          when ip_4
+            ['ip_4@test.zzz']
+          when 'b'
+            ['b@test.zzz']
+          when 'c'
+            ['c@test.zzz']
+          when 'd'
+            ['d@test.zzz']
+        end
+      end
+    end
+  end
   let(:from_entries) { [{data: 'from_1@test.zzz'}, {data: 'from_2@test.zzz'}] }
   let(:ip_1) { PhisherPhinder::ExtendedIp.new(ip_address: '10.0.0.1', geoip_ip_data: '1') }
   let(:ip_2) { PhisherPhinder::ExtendedIp.new(ip_address: '10.0.0.2', geoip_ip_data: '1') }
@@ -39,7 +59,7 @@ RSpec.describe PhisherPhinder::TracingReport do
   end
   let(:return_path_entries) { [{data: 'rp_1@test.zzz'}, {data: 'rp_2@test.zzz'}] }
 
-  subject { described_class.new(mail) }
+  subject { described_class.new(mail, contact_finder) }
 
   describe 'authentication' do
     describe 'successful SPF check' do
@@ -155,6 +175,28 @@ RSpec.describe PhisherPhinder::TracingReport do
       ]
     end
 
+    describe 'retrieving contact information for the senders' do
+      let(:received_spf) do
+        [
+          {
+            result: :pass,
+            ip: ip_3,
+            mailfrom: 'foo@test.com',
+            client_ip: ip_1
+          },
+        ]
+      end
+
+      it 'looks up contact details for each sender entry' do
+        expect(contact_finder).to receive(:contacts_for).with('c')
+        expect(contact_finder).to receive(:contacts_for).with(ip_3)
+        expect(contact_finder).to receive(:contacts_for).with('d')
+        expect(contact_finder).to receive(:contacts_for).with(ip_4)
+
+        report = subject.report
+      end
+    end
+
     describe 'SPF record has a IP entry' do
       let(:received_spf) do
         [
@@ -171,8 +213,14 @@ RSpec.describe PhisherPhinder::TracingReport do
         report = subject.report
 
         expect(report[:tracing]).to eql([
-          {sender: {host: 'c', ip: ip_3}},
-          {sender: {host: 'd', ip: ip_4}},
+          {
+            sender: {host: 'c', ip: ip_3},
+            sender_contact_details: {host: {email: ['c@test.zzz']}, ip: {email: ['ip_3@test.zzz']}}
+          },
+          {
+            sender: {host: 'd', ip: ip_4},
+            sender_contact_details: {host: {email: ['d@test.zzz']}, ip: {email: ['ip_4@test.zzz']}}
+          },
         ])
       end
     end
@@ -193,9 +241,18 @@ RSpec.describe PhisherPhinder::TracingReport do
         report = subject.report
 
         expect(report[:tracing]).to eql([
-          {sender: {host: 'b', ip: ip_2}},
-          {sender: {host: 'c', ip: ip_3}},
-          {sender: {host: 'd', ip: ip_4}},
+          {
+            sender: {host: 'b', ip: ip_2},
+            sender_contact_details: {host: {email: ['b@test.zzz']}, ip: {email: ['ip_2@test.zzz']}}
+          },
+          {
+            sender: {host: 'c', ip: ip_3},
+            sender_contact_details: {host: {email: ['c@test.zzz']}, ip: {email: ['ip_3@test.zzz']}}
+          },
+          {
+            sender: {host: 'd', ip: ip_4},
+            sender_contact_details: {host: {email: ['d@test.zzz']}, ip: {email: ['ip_4@test.zzz']}}
+          },
         ])
       end
     end
@@ -229,7 +286,7 @@ RSpec.describe PhisherPhinder::TracingReport do
     end
 
     it 'returns empty collections if there are no origin headers available' do
-      report = described_class.new(mail_without_origin_headers).report
+      report = described_class.new(mail_without_origin_headers, contact_finder).report
 
       expect(report[:origin]).to eql({
         from: [],

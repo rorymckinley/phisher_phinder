@@ -97,14 +97,14 @@ The output of PhisherPhinder will produce something similar to the below:
 +-----------+---------------+------------------+
 
 
-+---------------+------------------------------+------------------------------+--------------------------+
-|                                                 Trace                                                  |
-+---------------+------------------------------+------------------------------+--------------------------+
-| Sender IP     | Sender Host                  | Advertised Sender            | Recipient                |
-+---------------+------------------------------+------------------------------+--------------------------+
-| 10.0.0.1      | host1.test.zzz               | dodgyname.test.zzz           | mx.google.com            |
-| 10.0.0.2      |                              | othersdodgyname.text.zzz     | host1.test.zzz           |
-+---------------+------------------------------+------------------------------+--------------------------+
++--------------+----------------------+-----------------------+--------------------------------+-----------------------+-----------------------+
+|                                                                    Trace                                                                     |
++--------------+----------------------+-----------------------+--------------------------------+-----------------------+-----------------------+
+| Sender IP    | IP Contacts          | Sender Host           | Host Contacts                  | Advertised Sender     | Recipient             |
++--------------+----------------------+-----------------------+--------------------------------+-----------------------+-----------------------+
+| 10.0.0.1     | abuse@hosttwo.zzz    | host.test.zzz         | support@test.zzz               | dodgy.test.zzz        | mx.google.com         |
+| 10.0.0.2     | abuse@hostone.zzz    |                       |                                | dodgy.othertest.zzz   | mail.hostthree.zzz    |
++--------------+----------------------+-----------------------+--------------------------------+-----------------------+-----------------------+
 
 ```
 
@@ -116,7 +116,8 @@ be trusted.
 
 The `Trace` secion shows a subset of the `Received` headers from the original (advertised, but not necessarily actual) 
 origin (the last entry in the table) to the last external server to process the email before the recipient's mail host 
-received the email.
+received the email. The contacts are abuse contacts for the sender IP and the sender host as found in the results of a 
+WHOIS lookup. If this could not be resolved, these fields will be blank.
 
 ## Dependencies
 1. [Maxmind GeoIP2 User Account](https://dev.maxmind.com/geoip/geoip2/web-services/) - pay as you go

@@ -4,7 +4,9 @@ require 'timecop'
 
 RSpec.describe PhisherPhinder::Command do
   describe '#report' do
+    let(:contact_finder) { instance_double(PhisherPhinder::ContactFinder) }
     let(:contents) { "foo" }
+    let(:extractor) { instance_double(PhisherPhinder::WhoisEmailExtractor) }
     let(:geoip_settings) { {account_id: 'foo', license_key: 'bar'} }
     let(:ip_factory) { instance_double(PhisherPhinder::ExtendedIpFactory) }
     let(:mail) { instance_double(PhisherPhinder::Mail) }
@@ -13,6 +15,7 @@ RSpec.describe PhisherPhinder::Command do
     let(:null_client) { instance_double(PhisherPhinder::NullLookupClient) }
     let(:report_output) { {report: :output} }
     let(:tracing_report) { instance_double(PhisherPhinder::TracingReport, report: report_output) }
+    let(:whois_client) { instance_double(Whois::Client) }
     let(:now) { Time.now }
     let(:options) { {line_ending: "\r\n", geoip_lookup: false} }
 
@@ -21,6 +24,9 @@ RSpec.describe PhisherPhinder::Command do
       allow(PhisherPhinder::ExtendedIpFactory).to receive(:new).and_return(ip_factory)
       allow(PhisherPhinder::MailParser::Parser).to receive(:new).and_return(mail_parser)
       allow(PhisherPhinder::TracingReport).to receive(:new).and_return(tracing_report)
+      allow(Whois::Client).to receive(:new).and_return(whois_client)
+      allow(PhisherPhinder::WhoisEmailExtractor).to receive(:new).and_return(extractor)
+      allow(PhisherPhinder::ContactFinder).to receive(:new).and_return(contact_finder)
     end
 
     describe 'initialising the ip lookup client' do
@@ -58,8 +64,26 @@ RSpec.describe PhisherPhinder::Command do
       subject.report(contents, **options)
     end
 
+    it 'intialises the Whois client' do
+      expect(Whois::Client).to receive(:new)
+
+      subject.report(contents, **options)
+    end
+
+    it 'initialises the email extractor' do
+      expect(PhisherPhinder::WhoisEmailExtractor).to receive(:new)
+
+      subject.report(contents, **options)
+    end
+
+    it 'initialises the ContactFinder' do
+      expect(PhisherPhinder::ContactFinder).to receive(:new).with(whois_client: whois_client, extractor: extractor)
+
+      subject.report(contents, **options)
+    end
+
     it 'initialises the TraceReport' do
-      expect(PhisherPhinder::TracingReport).to receive(:new).with(mail)
+      expect(PhisherPhinder::TracingReport).to receive(:new).with(mail, contact_finder)
 
       subject.report(contents, **options)
     end

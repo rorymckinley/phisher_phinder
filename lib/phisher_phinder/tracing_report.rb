@@ -2,8 +2,9 @@
 
 module PhisherPhinder
   class TracingReport
-    def initialize(mail)
+    def initialize(mail, contact_finder)
       @mail = mail
+      @contact_finder = contact_finder
     end
 
     def report
@@ -34,7 +35,14 @@ module PhisherPhinder
 
     def extract_tracing_headers(received_headers, latest_spf_entry)
       start = received_headers[:received].find_index { |h| h[:sender][:ip] == ip_address(latest_spf_entry) }
-      received_headers[:received][start..-1]
+      received_headers[:received][start..-1].map do |h|
+        h.merge(
+          sender_contact_details: {
+            host: {email: @contact_finder.contacts_for(h[:sender][:host])},
+            ip: {email: @contact_finder.contacts_for(h[:sender][:ip])},
+          }
+        )
+      end
     end
 
     def extract_origin_headers(headers)

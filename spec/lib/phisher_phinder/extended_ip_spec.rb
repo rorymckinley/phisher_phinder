@@ -20,6 +20,7 @@ RSpec.describe PhisherPhinder::ExtendedIp do
     expect(subject).to eq described_class.new(ip_address: ip_address_1, geoip_ip_data: geoip_data_1)
     expect(subject).to_not eq described_class.new(ip_address: ip_address_2, geoip_ip_data: geoip_data_1)
     expect(subject).to_not eq described_class.new(ip_address: ip_address_1, geoip_ip_data: geoip_data_2)
+    expect(subject).to_not eq '99.99.99.98'
   end
 
   it 'returns the ip address as a string when to_s is called' do

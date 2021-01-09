@@ -1,12 +1,15 @@
 require "phisher_phinder/version"
 
 require 'maxmind/geoip2'
+require 'whois-parser'
 
 require_relative './phisher_phinder/command'
 require_relative './phisher_phinder/display'
 
 require_relative './phisher_phinder/body_hyperlink'
 require_relative './phisher_phinder/cached_geoip_client'
+require_relative './phisher_phinder/contact_finder'
+require_relative './phisher_phinder/whois_email_extractor'
 require_relative './phisher_phinder/null_lookup_client'
 require_relative './phisher_phinder/null_response'
 require_relative './phisher_phinder/geoip_ip_data'

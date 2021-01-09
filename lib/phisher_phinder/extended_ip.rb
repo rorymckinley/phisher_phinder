@@ -10,7 +10,7 @@ module PhisherPhinder
     end
 
     def ==(other)
-      ip_address == other.ip_address && geoip_ip_data == other.geoip_ip_data
+      other.instance_of?(self.class) && ip_address == other.ip_address && geoip_ip_data == other.geoip_ip_data
     end
 
     def to_s
