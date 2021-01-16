@@ -1,27 +1,40 @@
 # frozen_string_literal: true
 
 RSpec.describe PhisherPhinder::TracingReport do
-  let(:contact_finder) do
-    instance_double(PhisherPhinder::ContactFinder).tap do |dbl|
-      allow(dbl).to receive(:contacts_for) do |arg|
+  let(:bar_hyperlink) { PhisherPhinder::BodyHyperlink.new('http://test.bar', 'Bar') }
+  let(:host_information_finder) do
+    instance_double(PhisherPhinder::HostInformationFinder).tap do |dbl|
+      allow(dbl).to receive(:information_for) do |arg|
         case arg
           when ip_2
-            ['ip_2@test.zzz']
+            {abuse_contacts: ['ip_2@test.zzz']}
           when ip_3
-            ['ip_3@test.zzz']
+            {abuse_contacts: ['ip_3@test.zzz']}
           when ip_4
-            ['ip_4@test.zzz']
+            {abuse_contacts: ['ip_4@test.zzz']}
           when 'b'
-            ['b@test.zzz']
+            {abuse_contacts: ['b@test.zzz']}
           when 'c'
-            ['c@test.zzz']
+            {abuse_contacts: ['c@test.zzz']}
           when 'd'
-            ['d@test.zzz']
+            {abuse_contacts: ['d@test.zzz']}
         end
       end
     end
   end
+  let(:foo_hyperlink) { PhisherPhinder::BodyHyperlink.new('http://test.foo', 'Foo') }
   let(:from_entries) { [{data: 'from_1@test.zzz'}, {data: 'from_2@test.zzz'}] }
+  let(:link_explorer) do
+    instance_double(PhisherPhinder::LinkExplorer).tap do |dbl|
+      allow(dbl).to receive(:explore) do |arg|
+        if arg == bar_hyperlink
+          [{bar: :data}, {bar_one: :data}]
+        elsif arg == foo_hyperlink
+          [{foo: :data}, {foo_one: :data}]
+        end
+      end
+    end
+  end
   let(:ip_1) { PhisherPhinder::ExtendedIp.new(ip_address: '10.0.0.1', geoip_ip_data: '1') }
   let(:ip_2) { PhisherPhinder::ExtendedIp.new(ip_address: '10.0.0.2', geoip_ip_data: '1') }
   let(:ip_3) { PhisherPhinder::ExtendedIp.new(ip_address: '10.0.0.3', geoip_ip_data: '1') }
@@ -39,7 +52,9 @@ RSpec.describe PhisherPhinder::TracingReport do
       tracing_headers: {
         received: received_headers
       },
-      body: '',
+      body: {
+        html: '<a href="http://test.foo">Foo</a><a href="http://test.bar">Bar</a><a href="http://test.foo">Foo</a><'
+      },
       authentication_headers: {
         received_spf: received_spf
       }
@@ -59,7 +74,9 @@ RSpec.describe PhisherPhinder::TracingReport do
   end
   let(:return_path_entries) { [{data: 'rp_1@test.zzz'}, {data: 'rp_2@test.zzz'}] }
 
-  subject { described_class.new(mail, contact_finder) }
+  subject do
+    described_class.new(mail: mail, host_information_finder: host_information_finder, link_explorer: link_explorer)
+  end
 
   describe 'authentication' do
     describe 'successful SPF check' do
@@ -188,10 +205,10 @@ RSpec.describe PhisherPhinder::TracingReport do
       end
 
       it 'looks up contact details for each sender entry' do
-        expect(contact_finder).to receive(:contacts_for).with('c')
-        expect(contact_finder).to receive(:contacts_for).with(ip_3)
-        expect(contact_finder).to receive(:contacts_for).with('d')
-        expect(contact_finder).to receive(:contacts_for).with(ip_4)
+        expect(host_information_finder).to receive(:information_for).with('c')
+        expect(host_information_finder).to receive(:information_for).with(ip_3)
+        expect(host_information_finder).to receive(:information_for).with('d')
+        expect(host_information_finder).to receive(:information_for).with(ip_4)
 
         report = subject.report
       end
@@ -268,7 +285,7 @@ RSpec.describe PhisherPhinder::TracingReport do
         tracing_headers: {
           received: received_headers
         },
-        body: '',
+        body: {html: ''},
         authentication_headers: {
           received_spf: received_spf
         }
@@ -286,13 +303,32 @@ RSpec.describe PhisherPhinder::TracingReport do
     end
 
     it 'returns empty collections if there are no origin headers available' do
-      report = described_class.new(mail_without_origin_headers, contact_finder).report
+      report = described_class.new(
+        mail: mail_without_origin_headers, host_information_finder: host_information_finder, link_explorer: link_explorer
+      ).report
 
       expect(report[:origin]).to eql({
         from: [],
         return_path: [],
         message_id: []
       })
+    end
+  end
+
+  describe 'content_hyperlinks' do
+    it 'passes each of the unique hyperlinks found in the mail body to the hyperlink explorer' do
+      expect(link_explorer).to receive(:explore).with(foo_hyperlink)
+      expect(link_explorer).to receive(:explore).with(bar_hyperlink)
+
+      subject.report
+    end
+
+    it 'includes the hyperlinks together with the data from the explorer in the `content_hyperlinks` section' do
+      report = subject.report
+
+      expect(report[:content_hyperlinks]).to eql(
+        [[{foo: :data}, {foo_one: :data}], [{bar: :data}, {bar_one: :data}]]
+      )
     end
   end
 end

@@ -4,10 +4,12 @@ require 'timecop'
 
 RSpec.describe PhisherPhinder::Command do
   describe '#report' do
-    let(:contact_finder) { instance_double(PhisherPhinder::ContactFinder) }
+    let(:host_information_finder) { instance_double(PhisherPhinder::HostInformationFinder) }
     let(:contents) { "foo" }
     let(:extractor) { instance_double(PhisherPhinder::WhoisEmailExtractor) }
     let(:geoip_settings) { {account_id: 'foo', license_key: 'bar'} }
+    let(:host_response_policy) { PhisherPhinder::HostResponsePolicy.new }
+    let(:link_explorer) { instance_double(PhisherPhinder::LinkExplorer) }
     let(:ip_factory) { instance_double(PhisherPhinder::ExtendedIpFactory) }
     let(:mail) { instance_double(PhisherPhinder::Mail) }
     let(:mail_parser) { instance_double(PhisherPhinder::MailParser::Parser, parse: mail) }
@@ -26,7 +28,8 @@ RSpec.describe PhisherPhinder::Command do
       allow(PhisherPhinder::TracingReport).to receive(:new).and_return(tracing_report)
       allow(Whois::Client).to receive(:new).and_return(whois_client)
       allow(PhisherPhinder::WhoisEmailExtractor).to receive(:new).and_return(extractor)
-      allow(PhisherPhinder::ContactFinder).to receive(:new).and_return(contact_finder)
+      allow(PhisherPhinder::HostInformationFinder).to receive(:new).and_return(host_information_finder)
+      allow(PhisherPhinder::LinkExplorer).to receive(:new).and_return(link_explorer)
     end
 
     describe 'initialising the ip lookup client' do
@@ -76,14 +79,26 @@ RSpec.describe PhisherPhinder::Command do
       subject.report(contents, **options)
     end
 
-    it 'initialises the ContactFinder' do
-      expect(PhisherPhinder::ContactFinder).to receive(:new).with(whois_client: whois_client, extractor: extractor)
+    it 'initialises the HostInformationFinder' do
+      expect(PhisherPhinder::HostInformationFinder).to receive(:new).
+        with(whois_client: whois_client, extractor: extractor)
+
+      subject.report(contents, **options)
+    end
+
+    it 'initialises the hyperlink explorer' do
+      expect(PhisherPhinder::LinkExplorer).to receive(:new).with(
+        host_information_finder: host_information_finder,
+        host_response_policy: an_instance_of(PhisherPhinder::HostResponsePolicy)
+      )
 
       subject.report(contents, **options)
     end
 
     it 'initialises the TraceReport' do
-      expect(PhisherPhinder::TracingReport).to receive(:new).with(mail, contact_finder)
+      expect(PhisherPhinder::TracingReport).to receive(:new).with(
+        mail: mail, host_information_finder: host_information_finder, link_explorer: link_explorer
+      )
 
       subject.report(contents, **options)
     end

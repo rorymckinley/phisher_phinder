@@ -45,7 +45,8 @@ RSpec.describe PhisherPhinder::Display do
               ip: {email: ['ip_3@test.zzz', 'ip_4@test.zzz']}
             }
           }
-        ]
+        ],
+        content_hyperlinks: []
       }
     end
 
@@ -70,7 +71,8 @@ RSpec.describe PhisherPhinder::Display do
                 ip: {email: ['ip_1@test.zzz', 'ip_2@test.zzz']}
               }
             },
-          ]
+          ],
+          content_hyperlinks: []
         }
       end
       let(:input_with_dirty_contact_details) do
@@ -93,7 +95,8 @@ RSpec.describe PhisherPhinder::Display do
                 ip: {email: ['<ip_1@test.zzz>', '<ip_2@test.zzz>,']}
               }
             },
-          ]
+          ],
+          content_hyperlinks: []
         }
       end
 
@@ -146,7 +149,8 @@ RSpec.describe PhisherPhinder::Display do
             message_id: [],
             return_path: []
           },
-          tracing: []
+          tracing: [],
+          content_hyperlinks: []
         }
       end
 
@@ -178,6 +182,133 @@ RSpec.describe PhisherPhinder::Display do
           subject.display_report(input)
         end.to output(/Return Path.+rp_1@test.zzz, rp_2@test.zzz/).to_stdout
       end
+    end
+
+    describe 'content_hyperlinks' do
+      let(:host_information_0) do
+        {
+          abuse_contacts: ['a@b.com', 'b@c.com'],
+          creation_date: now - 100,
+        }
+      end
+      let(:host_information_1) do
+        {
+          abuse_contacts: ['c@b.com', 'd@c.com'],
+          creation_date: nil,
+        }
+      end
+      let(:host_information_2) do
+        {
+          abuse_contacts: ['d@b.com', 'e@c.com'],
+          creation_date: now - 80,
+        }
+      end
+      let(:host_information_3) do
+        {
+          abuse_contacts: ['f@b.com', 'g@c.com'],
+          creation_date: now - 70,
+        }
+      end
+      let(:host_information_4) do
+        {
+          abuse_contacts: ['g@b.com', 'h@c.com'],
+          creation_date: now - 60,
+        }
+      end
+      let(:input) do
+        {
+          authentication: {
+            spf: {
+              ip: ip_7,
+              from_address: 'foo@test.zzz',
+              client_ip: ip_8,
+              success: false
+            }
+          },
+          origin: {
+            from: [],
+            message_id: [],
+            return_path: []
+          },
+          tracing: [],
+          content_hyperlinks: [
+            [
+              PhisherPhinder::LinkHost.new(
+                url: URI.parse(url_0),
+                body: '',
+                status_code: 301,
+                headers: {},
+                host_information: host_information_0,
+              ),
+              PhisherPhinder::LinkHost.new(
+                url: URI.parse(url_1),
+                body: '',
+                status_code: 301,
+                headers: {},
+                host_information: host_information_1,
+              ),
+              PhisherPhinder::LinkHost.new(
+                url: URI.parse(url_2),
+                body: '',
+                status_code: 200,
+                headers: {},
+                host_information: host_information_2,
+              )
+            ],
+            [
+              PhisherPhinder::LinkHost.new(
+                url: URI.parse(url_3),
+                body: '',
+                status_code: 301,
+                headers: {},
+                host_information: host_information_3,
+              ),
+              PhisherPhinder::LinkHost.new(
+                url: URI.parse(url_4),
+                body: '',
+                status_code: 200,
+                headers: {},
+                host_information: host_information_4,
+              ),
+            ]
+          ]
+        }
+      end
+      let(:now) { Time.now }
+      let(:url_0) { 'https://foo.bar/buzz?biz=boz' }
+      let(:url_1) { 'https://biz.bar/foo?bar=biz' }
+      let(:url_2) { 'https://boz.bar/buzz?bur=baz' }
+      let(:url_3) { 'https://baz.bar/foo?bur=baz' }
+      let(:url_4) { 'https://bez.bar/buzz?bur=baz' }
+
+      it 'displays the hyperlinks found in the mail body' do
+        expect do
+          subject.display_report(input)
+        end.to output(
+          %r{
+            #{host_entry('https://foo.bar/buzz?biz=boz' , host_information_0)}
+            \t#{host_entry(url_1, host_information_1)}
+            \t\t#{host_entry(url_2, host_information_2)}
+          }mx
+        ).to_stdout
+
+        expect do
+          subject.display_report(input)
+        end.to output(
+          %r{
+            #{host_entry(url_3, host_information_3)}
+            \t#{host_entry(url_4, host_information_4)}
+          }mx
+        ).to_stdout
+      end
+
+      def host_entry(url, info)
+        escaped_url = url.gsub(/\?/, '\?')
+        creation_date = info[:creation_date] ? info[:creation_date].strftime('%Y-%m-%d\\s%H:%M:%S') : nil
+
+        "#{escaped_url}\\s\\(#{creation_date}\\)\\s\\[#{info[:abuse_contacts].join(',\\s')}\\]\\n"
+      end
+
     end
   end
 end

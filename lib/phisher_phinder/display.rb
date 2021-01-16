@@ -47,6 +47,21 @@ module PhisherPhinder
       )
 
       puts trace_table
+
+      puts "\n\n"
+
+      puts 'Body Hyperlinks'
+      puts "\n"
+      input_data[:content_hyperlinks].each do |link_set|
+        link_set.each_with_index do |link_host, tab_count|
+          puts "#{"\t"*tab_count}" +
+            "#{link_host.url.to_s} " +
+            "(#{display_creation_date(link_host)}) " +
+            "[#{display_email_addresses(link_host.host_information[:abuse_contacts])}]" +
+            "\n"
+        end
+        puts "\n"
+      end
     end
 
     private
@@ -65,6 +80,10 @@ module PhisherPhinder
 
     def display_email_addresses(email_addresses)
       email_addresses.map { |address| address.gsub(/[,<>]/, '') }.join(', ')
+    end
+
+    def display_creation_date(link_host)
+      (date = link_host.host_information[:creation_date]) ? date.strftime('%Y-%m-%d %H:%M:%S') : nil
     end
   end
 end

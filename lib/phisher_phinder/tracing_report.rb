@@ -2,9 +2,10 @@
 
 module PhisherPhinder
   class TracingReport
-    def initialize(mail, contact_finder)
+    def initialize(mail:, host_information_finder:, link_explorer:)
       @mail = mail
-      @contact_finder = contact_finder
+      @host_information_finder = host_information_finder
+      @link_explorer = link_explorer
     end
 
     def report
@@ -19,7 +20,8 @@ module PhisherPhinder
           }
         },
         origin: extract_origin_headers(@mail.headers),
-        tracing: extract_tracing_headers(@mail.tracing_headers, latest_spf_entry)
+        tracing: extract_tracing_headers(@mail.tracing_headers, latest_spf_entry),
+        content_hyperlinks: explore_hyperlinks(@mail.hypertext_links),
       }
     end
 
@@ -38,8 +40,16 @@ module PhisherPhinder
       received_headers[:received][start..-1].map do |h|
         h.merge(
           sender_contact_details: {
-            host: {email: @contact_finder.contacts_for(h[:sender][:host])},
-            ip: {email: @contact_finder.contacts_for(h[:sender][:ip])},
+            host: {
+              email: @host_information_finder.information_for(
+                h[:sender][:host]
+              )[:abuse_contacts]
+            },
+            ip: {
+              email: @host_information_finder.information_for(
+                h[:sender][:ip]
+              )[:abuse_contacts]
+            },
           }
         )
       end
@@ -50,6 +60,10 @@ module PhisherPhinder
         entries = headers[header_type] || []
         output.merge(header_type => entries.map { |h| h[:data] })
       end
+    end
+
+    def explore_hyperlinks(hyperlinks)
+      (hyperlinks.uniq { |link| link.href }).map { |hyperlink| @link_explorer.explore(hyperlink) }
     end
   end
 end
