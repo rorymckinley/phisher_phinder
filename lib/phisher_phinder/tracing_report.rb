@@ -21,7 +21,9 @@ module PhisherPhinder
         },
         origin: extract_origin_headers(@mail.headers),
         tracing: extract_tracing_headers(@mail.tracing_headers, latest_spf_entry),
-        content_hyperlinks: explore_hyperlinks(@mail.hypertext_links),
+        content: {
+          linked_urls: explore_hyperlinks(@mail.hypertext_links),
+        },
       }
     end
 

@@ -50,9 +50,10 @@ module PhisherPhinder
 
       puts "\n\n"
 
-      puts 'Body Hyperlinks'
+      puts 'Body Content'
       puts "\n"
-      input_data[:content_hyperlinks].each do |link_set|
+      puts "Linked URLs"
+      input_data[:content][:linked_urls].each do |link_set|
         link_set.each_with_index do |link_host, tab_count|
           puts "#{"\t"*tab_count}" +
             "#{link_host.url.to_s} " +

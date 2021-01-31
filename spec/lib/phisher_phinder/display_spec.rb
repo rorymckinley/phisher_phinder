@@ -46,7 +46,9 @@ RSpec.describe PhisherPhinder::Display do
             }
           }
         ],
-        content_hyperlinks: []
+        content: {
+          linked_urls: [],
+        }
       }
     end
 
@@ -72,7 +74,9 @@ RSpec.describe PhisherPhinder::Display do
               }
             },
           ],
-          content_hyperlinks: []
+          content: {
+            linked_urls: [],
+          }
         }
       end
       let(:input_with_dirty_contact_details) do
@@ -96,7 +100,9 @@ RSpec.describe PhisherPhinder::Display do
               }
             },
           ],
-          content_hyperlinks: []
+          content: {
+            linked_urls: []
+          }
         }
       end
 
@@ -150,7 +156,9 @@ RSpec.describe PhisherPhinder::Display do
             return_path: []
           },
           tracing: [],
-          content_hyperlinks: []
+          content: {
+            linked_urls: []
+          }
         }
       end
 
@@ -231,47 +239,49 @@ RSpec.describe PhisherPhinder::Display do
             return_path: []
           },
           tracing: [],
-          content_hyperlinks: [
-            [
-              PhisherPhinder::LinkHost.new(
-                url: URI.parse(url_0),
-                body: '',
-                status_code: 301,
-                headers: {},
-                host_information: host_information_0,
-              ),
-              PhisherPhinder::LinkHost.new(
-                url: URI.parse(url_1),
-                body: '',
-                status_code: 301,
-                headers: {},
-                host_information: host_information_1,
-              ),
-              PhisherPhinder::LinkHost.new(
-                url: URI.parse(url_2),
-                body: '',
-                status_code: 200,
-                headers: {},
-                host_information: host_information_2,
-              )
-            ],
-            [
-              PhisherPhinder::LinkHost.new(
-                url: URI.parse(url_3),
-                body: '',
-                status_code: 301,
-                headers: {},
-                host_information: host_information_3,
-              ),
-              PhisherPhinder::LinkHost.new(
-                url: URI.parse(url_4),
-                body: '',
-                status_code: 200,
-                headers: {},
-                host_information: host_information_4,
-              ),
+          content: {
+            linked_urls: [
+              [
+                PhisherPhinder::LinkHost.new(
+                  url: URI.parse(url_0),
+                  body: '',
+                  status_code: 301,
+                  headers: {},
+                  host_information: host_information_0,
+                ),
+                PhisherPhinder::LinkHost.new(
+                  url: URI.parse(url_1),
+                  body: '',
+                  status_code: 301,
+                  headers: {},
+                  host_information: host_information_1,
+                ),
+                PhisherPhinder::LinkHost.new(
+                  url: URI.parse(url_2),
+                  body: '',
+                  status_code: 200,
+                  headers: {},
+                  host_information: host_information_2,
+                )
+              ],
+              [
+                PhisherPhinder::LinkHost.new(
+                  url: URI.parse(url_3),
+                  body: '',
+                  status_code: 301,
+                  headers: {},
+                  host_information: host_information_3,
+                ),
+                PhisherPhinder::LinkHost.new(
+                  url: URI.parse(url_4),
+                  body: '',
+                  status_code: 200,
+                  headers: {},
+                  host_information: host_information_4,
+                ),
+              ]
             ]
-          ]
+          }
         }
       end
       let(:now) { Time.now }
@@ -308,7 +318,6 @@ RSpec.describe PhisherPhinder::Display do
 
         "#{escaped_url}\\s\\(#{creation_date}\\)\\s\\[#{info[:abuse_contacts].join(',\\s')}\\]\\n"
       end
-
     end
   end
 end

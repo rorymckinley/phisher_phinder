@@ -326,7 +326,7 @@ RSpec.describe PhisherPhinder::TracingReport do
     it 'includes the hyperlinks together with the data from the explorer in the `content_hyperlinks` section' do
       report = subject.report
 
-      expect(report[:content_hyperlinks]).to eql(
+      expect(report[:content][:linked_urls]).to eql(
         [[{foo: :data}, {foo_one: :data}], [{bar: :data}, {bar_one: :data}]]
       )
     end
