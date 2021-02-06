@@ -10,7 +10,7 @@ RSpec.describe PhisherPhinder::LinkExplorer do
       )
     end
 
-    describe 'mail hyperlink href points to url' do
+    describe 'hyperlink href points to url' do
       let(:headers_0) do
         {
           'Location' => url_1,
@@ -102,6 +102,25 @@ RSpec.describe PhisherPhinder::LinkExplorer do
             host_information: host_information_2,
           ),
         ])
+      end
+    end
+
+    describe 'hyperlink is a mail hyperlink' do
+      let(:host_information_finder) { nil }
+      let(:link_1) do
+        PhisherPhinder::BodyHyperlink.new('mailto:foo@test.com', '')
+      end
+      let(:link_2) do
+        PhisherPhinder::BodyHyperlink.new('mailto:foo@test.com ;bar@test.com; baz@test.com', '')
+      end
+      let(:link_3) do
+        PhisherPhinder::BodyHyperlink.new('mailto:foo@test.com;bar@test.com;foo@test.com;baz@test.com', '')
+      end
+
+      it 'returns a collection of email addresses contained within the href' do
+        expect(subject.explore(link_1)).to eql ['foo@test.com']
+        expect(subject.explore(link_2)).to eql ['foo@test.com', 'bar@test.com', 'baz@test.com']
+        expect(subject.explore(link_3)).to eql ['foo@test.com', 'bar@test.com', 'baz@test.com']
       end
     end
   end

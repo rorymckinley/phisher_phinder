@@ -27,10 +27,15 @@ RSpec.describe PhisherPhinder::TracingReport do
   let(:link_explorer) do
     instance_double(PhisherPhinder::LinkExplorer).tap do |dbl|
       allow(dbl).to receive(:explore) do |arg|
-        if arg == bar_hyperlink
+        case arg
+        when bar_hyperlink
           [{bar: :data}, {bar_one: :data}]
-        elsif arg == foo_hyperlink
+        when foo_hyperlink
           [{foo: :data}, {foo_one: :data}]
+        when mail_hyperlink_1
+          ['mail_1@test.com', 'mail_2@test.com', 'mail_3@test.com']
+        when mail_hyperlink_2
+          ['mail_3@test.com', 'mail_4@test.com']
         end
       end
     end
@@ -53,13 +58,19 @@ RSpec.describe PhisherPhinder::TracingReport do
         received: received_headers
       },
       body: {
-        html: '<a href="http://test.foo">Foo</a><a href="http://test.bar">Bar</a><a href="http://test.foo">Foo</a><'
+        html: '<a href="http://test.foo">Foo</a>' +
+        '<a href="mailto:mail_1@test.com">Mail One</a>' +
+        '<a href="http://test.bar">Bar</a>' +
+        '<a href="mailto:mail_3@test.com">Mail Three</a>' +
+        '<a href="http://test.foo">Foo</a>'
       },
       authentication_headers: {
         received_spf: received_spf
       }
     )
   end
+  let(:mail_hyperlink_1) { PhisherPhinder::BodyHyperlink.new('mailto:mail_1@test.com', 'Mail One') }
+  let(:mail_hyperlink_2) { PhisherPhinder::BodyHyperlink.new('mailto:mail_3@test.com', 'Mail Three') }
   let(:message_id_entries) { [{data: 'message_id_1'}, {data: 'message_id_2'}] }
   let(:received_headers) { [] }
   let(:received_spf) do
@@ -323,11 +334,19 @@ RSpec.describe PhisherPhinder::TracingReport do
       subject.report
     end
 
-    it 'includes the hyperlinks together with the data from the explorer in the `content_hyperlinks` section' do
+    it 'includes urls that are linked within the mail body' do
       report = subject.report
 
       expect(report[:content][:linked_urls]).to eql(
         [[{foo: :data}, {foo_one: :data}], [{bar: :data}, {bar_one: :data}]]
+      )
+    end
+
+    it 'includes any email address that are linked to within the body' do
+      report = subject.report
+
+      expect(report[:content][:linked_email_addresses]).to eql(
+        ['mail_1@test.com', 'mail_2@test.com', 'mail_3@test.com', 'mail_4@test.com']
       )
     end
   end

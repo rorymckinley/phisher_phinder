@@ -9,27 +9,32 @@ module PhisherPhinder
     end
 
     def explore(hyperlink)
-      chain_terminated = false
-      url = hyperlink.href
-      output = []
+      if hyperlink.type == :url
+        chain_terminated = false
+        url = hyperlink.href
+        output = []
 
-      until chain_terminated do
-        result = Excon.get(url.to_s)
+        until chain_terminated do
+          result = Excon.get(url.to_s)
 
-        output << LinkHost.new(
-          url: url,
-          body: result.body,
-          headers: result.headers,
-          status_code: result.status,
-          host_information: @host_information_finder.information_for("#{url.scheme}://#{url.host}"),
-        )
+          output << LinkHost.new(
+            url: url,
+            body: result.body,
+            headers: result.headers,
+            status_code: result.status,
+            host_information: @host_information_finder.information_for("#{url.scheme}://#{url.host}"),
+          )
 
-        unless url = @host_response_policy.next_url(result)
-          chain_terminated = true
+          unless url = @host_response_policy.next_url(result)
+            chain_terminated = true
+          end
         end
-      end
 
-      output
+        output
+      else
+        hyperlink.href =~ /mailto:(.+)/
+        ($1.split(';').map { |address| address.strip }).uniq
+      end
     end
   end
 end

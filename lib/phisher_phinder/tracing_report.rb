@@ -21,9 +21,7 @@ module PhisherPhinder
         },
         origin: extract_origin_headers(@mail.headers),
         tracing: extract_tracing_headers(@mail.tracing_headers, latest_spf_entry),
-        content: {
-          linked_urls: explore_hyperlinks(@mail.hypertext_links),
-        },
+        content: explore_hyperlinks(@mail.hypertext_links)
       }
     end
 
@@ -65,7 +63,13 @@ module PhisherPhinder
     end
 
     def explore_hyperlinks(hyperlinks)
-      (hyperlinks.uniq { |link| link.href }).map { |hyperlink| @link_explorer.explore(hyperlink) }
+      url_hyperlinks = (hyperlinks.select{ |link| link.type == :url }).uniq { |link| link.href }
+      email_hyperlinks = hyperlinks.select { |link| link.type == :email_address }
+
+      {
+        linked_urls: url_hyperlinks.map { |hyperlink| @link_explorer.explore(hyperlink) },
+        linked_email_addresses: (email_hyperlinks.map { |hyperlink| @link_explorer.explore(hyperlink) }).flatten.uniq
+      }
     end
   end
 end
