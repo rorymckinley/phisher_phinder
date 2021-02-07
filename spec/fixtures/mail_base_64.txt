@@ -64,7 +64,7 @@ Message-ID: <mLNmRwgmailaQ6vzwXhbYcM.atl370308050784@dodgy.com>
 Reply-To: <N3M8G6FZ1PCWHSB@2624.698>
 Message-ID: <pNFTgPSmailjz9YdTZpSzC4.atl047128319854@dodgy.com>
 Reply-To: <6LCNMRYZWC11Z8C@1699.813>
-Content-Type: text/html; charset=UTF-8
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: base64
 
 VGhpcyBpcyB0aGUg

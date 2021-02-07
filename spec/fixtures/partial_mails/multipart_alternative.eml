@@ -1,0 +1,31 @@
+MIME-Version: 1.0
+Content-Type: multipart/alternative; boundary="boundary-foo-bar-baz"
+
+--boundary-foo-bar-baz
+
+Unencoded Text
+--boundary-foo-bar-baz
+Content-Type: text/html; charset=utf-8
+Content-Transfer-Encoding: base64
+
+VGhpcyBpcyB0aGUgZmlyc3QgcGFydCBvZiB0aGUgSFRNTCBib2R5LgpJdCBj
+b250YWlucyBtb3JlIHRoYW4gb25lIGxpbmUu
+--boundary-foo-bar-baz
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: base64
+
+VGhpcyBpcyB0aGUgZmlyc3QgcGFydCBvZiB0aGUgdGV4dCBib2R5LgpJdCBj
+b250YWlucyBtb3JlIHRoYW4gb25lIGxpbmUu
+--boundary-foo-bar-baz
+Content-Type: text/html; charset=utf-8
+Content-Transfer-Encoding: base64
+
+VGhpcyBpcyB0aGUgc2Vjb25kIHBhcnQgb2YgdGhlIEhUTUwgYm9keS4KSXQg
+Y29udGFpbnMgbW9yZSB0aGFuIG9uZSBsaW5lLg==
+--boundary-foo-bar-baz
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: base64
+
+VGhpcyBpcyB0aGUgc2Vjb25kIHBhcnQgb2YgdGhlIHRleHQgYm9keS4KSXQg
+Y29udGFpbnMgbW9yZSB0aGFuIG9uZSBsaW5lLg==
+--boundary-foo-bar-baz--

@@ -13,13 +13,13 @@ module PhisherPhinder
       def parse(contents)
         original_headers, original_body = separate(contents)
         headers = extract_headers(original_headers)
-        Mail.new(
+        PhisherPhinder::Mail.new(
           original_email: contents,
           original_headers: original_headers,
           original_body: original_body,
           headers: headers,
           tracing_headers: generate_tracing_headers(headers),
-          body: parse_body(original_body, headers),
+          body: MailParser::BodyParser.new.parse(contents),
           authentication_headers: generate_authentication_headers(headers)
         )
       end
@@ -84,14 +84,6 @@ module PhisherPhinder
 
       def restore_sequence(values)
         values.sort { |a,b| b[:sequence] <=> a[:sequence] }
-      end
-
-      def parse_body(original_body, headers)
-        MailParser::BodyParser.new(@line_ending).parse(
-          body_contents: original_body,
-          content_type: content_type_data(headers),
-          content_transfer_encoding: content_transfer_encoding_data(headers),
-        )
       end
 
       def valid_base64_decoded(text)

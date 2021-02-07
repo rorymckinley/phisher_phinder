@@ -29,6 +29,7 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency "dotenv", "~> 2.7.5"
   spec.add_dependency "excon", "~> 0.78.1"
+  spec.add_dependency "mail"
   spec.add_dependency "maxmind-geoip2", "~> 0.4.0"
   spec.add_dependency "nokogiri", "~> 1.11.0"
   spec.add_dependency "sequel", "~> 5.33"

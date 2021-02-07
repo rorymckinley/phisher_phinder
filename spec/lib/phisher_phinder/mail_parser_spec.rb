@@ -211,7 +211,7 @@ RSpec.describe PhisherPhinder::MailParser::Parser do
       end
 
       it 'decodes the mail body if it is specified as base64-encoded' do
-        expect(parsed_mail_with_base64_body.body).to eql({html: 'This is the base 64 body', text: nil})
+        expect(parsed_mail_with_base64_body.body).to eql({html: nil, text: 'This is the base 64 body'})
       end
 
       it 'decodes the mail body if it is multipart-encoded' do
