@@ -25,7 +25,7 @@ module PhisherPhinder
             host_information: @host_information_finder.information_for("#{url.scheme}://#{url.host}"),
           )
 
-          unless url = @host_response_policy.next_url(result)
+          unless url = @host_response_policy.next_url(url, result)
             chain_terminated = true
           end
         end

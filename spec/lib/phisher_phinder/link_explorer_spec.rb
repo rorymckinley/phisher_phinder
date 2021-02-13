@@ -103,6 +103,73 @@ RSpec.describe PhisherPhinder::LinkExplorer do
           ),
         ])
       end
+
+      describe 'when a url redirects to a relative path' do
+        let(:headers_2) do
+          {
+            'Location' => '/relative/path',
+            'X-Arb' => 'Host-2',
+          }
+        end
+        let(:headers_3) do
+          {
+            'X-Arb' => 'Host-3',
+          }
+        end
+        let(:url_3) { 'https://boz.bar/relative/path' }
+
+        before(:each) do
+          allow(host_information_finder).to receive(:information_for).
+            with('https://boz.bar/relative/path').
+            and_return(host_information_2)
+
+        end
+        it 'translates this to an url' do
+          stub_request(:get, url_2).
+            to_return(
+              body: 'Boz Bar Body',
+              status: [301, 'Moved Permanently'],
+              headers: headers_2
+            )
+          stub_request(:get, url_3).
+            to_return(
+              body: 'Baz Bar Body',
+              status: [200, ''],
+              headers: headers_3
+            )
+
+          expect(subject.explore(root_link)).to eq([
+            PhisherPhinder::LinkHost.new(
+              url: URI.parse(url_0),
+              body: 'Foo Bar Body',
+              status_code: 301,
+              headers: headers_0,
+              host_information: host_information_0,
+            ),
+            PhisherPhinder::LinkHost.new(
+              url: URI.parse(url_1),
+              body: 'Biz Bar Body',
+              status_code: 301,
+              headers: headers_1,
+              host_information: host_information_1,
+            ),
+            PhisherPhinder::LinkHost.new(
+              url: URI.parse(url_2),
+              body: 'Boz Bar Body',
+              status_code: 301,
+              headers: headers_2,
+              host_information: host_information_2,
+            ),
+            PhisherPhinder::LinkHost.new(
+              url: URI.parse(url_3),
+              body: 'Baz Bar Body',
+              status_code: 200,
+              headers: headers_3,
+              host_information: host_information_2,
+            ),
+          ])
+        end
+      end
     end
 
     describe 'hyperlink is a mail hyperlink' do
