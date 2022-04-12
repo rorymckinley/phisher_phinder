@@ -31,7 +31,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency "excon", "~> 0.78.1"
   spec.add_dependency "mail"
   spec.add_dependency "maxmind-geoip2", "~> 0.4.0"
-  spec.add_dependency "nokogiri", "~> 1.11.0"
+  spec.add_dependency "nokogiri", ">= 1.11", "< 1.14"
   spec.add_dependency "sequel", "~> 5.33"
   spec.add_dependency "sqlite3", "~> 1.4.2"
   spec.add_dependency "terminal-table", "~> 2.0.0"
